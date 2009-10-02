@@ -33,7 +33,15 @@ for f in *.foo ; do
 
       ../npiet-foogol -q $targ $f > /tmp/$b-tmp-$t.out
       ../npiet -e $maxe npiet-foogol.png </dev/null >> /tmp/$b-tmp-$t.out
-      if diff -q $b.out /tmp/$b-tmp-$t.out >/dev/null ; then : ; else
+      if diff -q $b.out /tmp/$b-tmp-$t.out >/dev/null ; then
+	rm -f ./a.out 2>/dev/null
+	## check against foogol if avail:
+	# ( foogol $f $b.c || fc $f $b.c ) && gcc $b.c \
+	#	&& ./a.out > /tmp/$b-tmp-$t.out \
+	#	&& diff -q $b.out /tmp/$b-tmp-$t.out >/dev/null \
+	#	&& echo ==== file=$f wrap=$t foogol diff ==== \
+	#	&& diff -u $b.out /tmp/$b-tmp-$t.out
+      else
         echo ==== file=$f wrap=$t ====
         diff -u $b.out /tmp/$b-tmp-$t.out
         fail=1

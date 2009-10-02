@@ -1,4 +1,4 @@
-.TH NPIET 1 "May 2004" "npiet v0.9"
+.TH NPIET 1 "Mar 2006" "npiet v1.0a"
 .SH NAME
 npiet \- an interpreter for the piet programming language
 .SH SYNOPSIS
@@ -9,6 +9,10 @@ npiet \- an interpreter for the piet programming language
 .B \-q
 |
 .B \-d
+|
+.B \-dpbug
+|
+.B \-v1
 |
 .B \-t
 ]
@@ -63,6 +67,14 @@ be more quiet.
 .TP
 .B \-d
 print debug output (lot's of more or less cryptic and mostly useless blurb).
+.TP
+.B \-dpbug
+model the perl piet interpreter. This changes the behavior when
+crossing white blocks (wrong interpretation of blocking after white).
+.TP
+.B \-v1
+model the nperl version 1.0 interpreter. This changes to the old
+behavior when crossing white blocks.
 .TP
 .B \-t
 print trace details.  For every step the interpreter print some details:
@@ -119,11 +131,13 @@ The picture to read. For ppm-formatted pictures this may be a - to read from
 - name of the trace picture file. It is overwritten if it exists.
 .SH AUTHOR
 Erik Schoenfelder <schoenfr@web.de>.
+.br
+-dpbug option by Bertram Felgenhauer <int-e@gmx.de>.
 .SH BUGS
 None seen - they are hidden in the oil painting ;-)
 .SH SEE ALSO
 .BR npietedit (1)
 .br
-.B "http://spog.gaertner.de/~schoenfr/npiet/"
+.B "http://www.bertnase.de/npiet/"
 .br
 .B "http://www.dangermouse.net/esoteric/piet.html"

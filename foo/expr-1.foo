@@ -1,5 +1,7 @@
 begin
 
+ /* note: contains extensions to foogol */
+
  integer i, j;
 
  i := 3;

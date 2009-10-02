@@ -11,7 +11,7 @@ exec wish "$0" "$@"
 ##
 ## more about the piet programming language and the npiet interpreter see:
 ##
-##	http://spog.gaertner.de/~schoenfr/npiet/
+##	http://www.bertnase.de/npiet/
 ##
 ## about the piet programming language see:
 ##
@@ -86,7 +86,7 @@ pack .top.shrink .top.enlarge .top.save .top.load .top.quit .top.version \
 ##
 ## number of cells:
 ##
-set c_maxx 32
+set c_maxx 48
 set c_maxy 32 
 
 for {set y 0} {$y < $c_maxy} {incr y} {

@@ -71,7 +71,7 @@ npiet.o:	npiet.c
 	$(CC) $(CFLAGS) $(PROF) -c npiet.c
 
 html:	npiet.1.html npietedit.1.html npiet-foogol.1.html
-	cp -av *.html win
+	if [ -d win ] ; then cp -av *.html win ; else true ; fi
 
 npiet.1.html:	npiet.1
 	groff -man -T html npiet.1 > npiet.1.html

@@ -11,7 +11,7 @@
  *
  * more about the piet programming language and the npiet interpreter see:
  *
- *	http://spog.gaertner.de/~schoenfr/npiet/
+ *	http://www.bertnase.de/npiet/
  *
  *
  *   compile:
@@ -54,7 +54,7 @@
  *
  */
 
-char *version = "v0.3a";
+char *version = "v1.1";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -113,6 +113,8 @@ usage (int rc)
   fprintf (stderr, "\t-te <n>    - graphic trace end (default: unlimited)\n");
   fprintf (stderr, "\t-n-str <s> - nase stuff: string-to-command\n");
   fprintf (stderr, "\t-d         - debug (default: off)\n");
+  fprintf (stderr, "\t-dpbug     - model the perl piet interpreter (default: off)\n");
+  fprintf (stderr, "\t-v1        - model the npiet v1.0 interpreter (default: off)\n");
 
   exit (rc);
 }
@@ -157,8 +159,14 @@ int pp_size = 49;
 /* work around broken source (wrong assumption about toggle of dp and cc): */
 int toggle_bug = 0;
 
+/* work around broken source (wrong interpretation of blocking after white): */
+int white_bug = 0;
+
 /* fun-stuff: create commands to print a string: */
 char *do_n_str = 0;
+
+/* fall back to npiet v1.0 behavior (pre changed white codel crossing): */
+int version_1 = 0;
 
 /* helper: */
 #define dprintf		if (debug) printf
@@ -194,7 +202,11 @@ parse_args (int argc, char **argv)
     } else if (! strcmp (argv [0], "-dpbug")) {
       /* just a tbd (how to follow wrong behavior ;-) */
       toggle_bug = 1;
-      vprintf ("info: setting toggle bug behavior\n");
+      white_bug = 1;
+      vprintf ("info: setting toggle bug and white bug behavior\n");
+    } else if (! strcmp (argv [0], "-v1")) {
+      version_1 = 1;
+      vprintf ("info: setting npiet version 1 behavior\n");
     } else if (! strcmp (argv [0], "-tpic")) {
 #ifndef HAVE_GD_H
       printf ("note: no GD support compiled in. the graphical trace "
@@ -212,7 +224,7 @@ parse_args (int argc, char **argv)
       if ((c_xy = atoi (argv [0])) < 1) {
 	fprintf (stderr, "warning: trace pixelzoom %d is invalid\n",
 		 c_xy);
-	c_xy = 40;
+	c_xy = 32;
       } 
       vprintf ("info: trace pixelzoom set to %d\n", c_xy);
       do_gdtrace = 1;
@@ -2116,7 +2128,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       if (num_stack < 1) {
 	tprintf ("info: out(char) failed: stack underflow \n");
       } else {
-	printf ("%lc", stack [num_stack - 1] & 0xff); fflush (stdout);
+	printf ("%c", stack [num_stack - 1] & 0xff); fflush (stdout);
 	if (trace || debug) {
 	  /* increase readability: */
 	  tprintf ("\n");
@@ -2173,6 +2185,10 @@ piet_step ()
     p_toggle = 0;
   }
 
+  if (white_bug) {
+    white_crossed = (c_col == c_white);
+  }
+
   /* save for trace output: */
   pre_xpos = p_xpos;
   pre_ypos = p_ypos;
@@ -2197,7 +2213,7 @@ piet_step ()
     n_x = p_xpos;
     n_y = p_ypos;
 
-    if (c_col == c_white) {
+    if (!white_bug && c_col == c_white) {
       /* head on: */
       if (tries == 0) {
 	tprintf ("trace: special case: we started at a white codel - continuing\n");
@@ -2242,7 +2258,7 @@ piet_step ()
      *    If the transition between colour blocks occurs via a slide
      *    across a white block, no command is executed.
      */
-    if (c_col == c_white || a_col == c_white) {
+    if ((!white_bug && c_col == c_white) || a_col == c_white) {
       while (a_col == c_white) {
 	dprintf ("deb: white cell passed to %d, %d (now col_idx %d)\n",
 		 a_x, a_y, a_col);
@@ -2251,11 +2267,63 @@ piet_step ()
 	a_col = get_cell (a_x, a_y);
       }
       
-      if (a_col >= 0) {
+      if (a_col >= 0 && a_col != c_black) {
 	/* a valid cell - continue without action: */
 	tprintf ("trace: white cell(s) crossed - continuing with no command "
 		 "at %d,%d...\n", a_x, a_y);
 	white_crossed = 1;
+      } else {
+        /*
+         * When sliding into a black block or over the edge of the world,
+         * the Perl Piet interpreter sets the white block as the current
+         * block. The Tower of Hanoi example relies on this behaviour.
+         */
+        if (white_bug) {
+          white_crossed = 1;
+          a_col = c_white;
+          a_x -= dp_dx (p_dir_pointer);
+          a_y -= dp_dy (p_dir_pointer);
+          tprintf("trace: entering white block at %d,%d (like the perl "
+                  "interpreter would)...\n", a_x, a_y);
+        }
+	else if (! version_1) {
+	  int *visited = NULL, visited_len = 0, i;
+	  white_crossed = 1;
+	  while (a_col < 0 || a_col == c_black) {
+	    a_col = c_white;
+	    a_x -= dp_dx (p_dir_pointer);
+	    a_y -= dp_dy (p_dir_pointer);
+	    tprintf("trace: hitting black block when sliding at %d,%d %c %c\n",
+		    a_x, a_y, p_codel_chooser, p_dir_pointer);
+	    p_codel_chooser = toggle_cc(p_codel_chooser);
+	    p_dir_pointer = turn_dp(p_dir_pointer);
+
+	    for (i = 0; i < visited_len; i++) {
+	      if (visited[i * 4 + 0] == a_x &&
+		  visited[i * 4 + 1] == a_y &&
+		  visited[i * 4 + 2] == p_codel_chooser &&
+		  visited[i * 4 + 3] == p_dir_pointer) {
+		return -1;
+	      }
+	    }
+
+	    visited = realloc(visited, 4 * (visited_len + 1) * sizeof(int));
+	    visited[i * 4 + 0] = a_x;
+	    visited[i * 4 + 1] = a_y;
+	    visited[i * 4 + 2] = p_codel_chooser;
+	    visited[i * 4 + 3] = p_dir_pointer;
+	    visited_len++;
+
+	    while (a_col == c_white) {
+	      dprintf ("deb: white cell passed to %d, %d (now col_idx %d)\n",
+		       a_x, a_y, a_col);
+	      a_x += dp_dx (p_dir_pointer);
+	      a_y += dp_dy (p_dir_pointer);
+	      a_col = get_cell (a_x, a_y);
+	    }
+	  }
+	  if (visited) free(visited);
+	}
       }
     }
 

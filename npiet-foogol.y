@@ -1,7 +1,7 @@
 %{
 /*
  * npiet-foogol.y:					Jun 2004
- * (schoenfr@web.de)
+ * (schoenfr@web.de)					Jan 2005
  *
  * This file is part of npiet.
  *
@@ -14,12 +14,12 @@
  *
  * more about the piet programming language and the npiet interpreter see:
  *
- *	http://spog.gaertner.de/~schoenfr/npiet/
+ *	http://www.bertnase.de/npiet/
  *
  * for more about foogol see comp.sources.unix archive Volume 8
  * and about cfoogol see Volume 42, Issue 88 (here a copy):
  *
- *	http://spog.gaertner.de/~schoenfr/foogol.html
+ *	http://www.bertnase.de/html/foogol.html
  *
  *
  * to compile better run ./configure and make from the npiet package, 
@@ -34,7 +34,7 @@
  * Have fun.
  */
 
-char *version = "v0.2b";
+char *version = "v1.1";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1912,18 +1912,14 @@ yylex ()
     int c2 = getc (f_in);
     if (c2 == '*') {
       c2 = 0;
-      while ((c = getc (f_in)) != '/' && c2 != '*') {
+      while ((c = getc (f_in)) != '/' || c2 != '*') {
 	if (c == EOF) {
 	  yyerror ("EOF in comment");
 	  exit (1);
 	} else if (c == '\n') {
 	  lineno++;
 	}
-	if (c2 == '*') {
-	  break;
-	} else {
-	  c2 = c;
-	}
+	c2 = c;
       }
       /* restart: */
       return yylex ();

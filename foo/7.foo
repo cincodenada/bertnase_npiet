@@ -4,11 +4,11 @@ integer i, j;
 
 j := 0;
 
-while j < 6 do begin
+while j # 6 do begin
 
   i := 0;
 
-  while i < 6 do begin
+  while i # 6 do begin
 
     prints ("i=");
     printn (i);
