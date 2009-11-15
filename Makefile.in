@@ -14,7 +14,7 @@ CC = @CC@
 ## warn flags for gcc compiler:
 ##
 # GWARN = -W -Wcomment -Wpointer-arith -Wcast-qual
-# GWAR2 = -Wall
+GWAR2 = -Wall
 WARN = $(GWARN) $(GWAR2)
 
 ##
@@ -33,6 +33,9 @@ LDFLAGS = -g
 
 ## Uncomment for profiling:
 # PROF = -pg
+
+## win cygwin static flag:
+# -mno-cygwin -static
 
 ##
 ## libraries:

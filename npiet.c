@@ -1,6 +1,6 @@
 /*
  * npiet.c:						May 2004
- * (schoenfr@web.de)
+ * (schoenfr@web.de)					Nov 2009
  *
  * npiet is an interperter for the piet programming language.
  * 
@@ -54,7 +54,7 @@
  *
  */
 
-char *version = "v1.1";
+char *version = "v1.1a";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -377,10 +377,10 @@ alloc_stack_space (int val)
     return;
   } else if (! stack) {
     max_stack = val;
-    stack = (long *) calloc (val, sizeof (int));
+    stack = (long *) calloc (val, sizeof (long));
   } else {
-    long *new_stack = (long *) calloc (val, sizeof (int));
-    memcpy (new_stack, stack, num_stack * sizeof(int));
+    long *new_stack = (long *) calloc (val, sizeof (long));
+    memcpy (new_stack, stack, num_stack * sizeof (long));
     free (stack);
     max_stack = val;
     stack = new_stack;
@@ -1000,7 +1000,8 @@ gd_try_step (int exec_step, int tries, int n_x, int n_y,
   gd_arrow (x1 + gd_try_xoff, y1 + gd_try_yoff, 
 	    x2 + gd_try_xoff, y2 + gd_try_yoff, dp, gd_grey [gd_try_dcol]);
 
-  gdImageString (im, gdft, x3 + gd_try_xoff, y3 + gd_try_yoff, tmp, 
+  gdImageString (im, gdft, x3 + gd_try_xoff, y3 + gd_try_yoff, 
+		 (unsigned char *) tmp, 
 		 gd_grey [gd_try_dcol]);
 
 #if 0
@@ -1008,7 +1009,8 @@ gd_try_step (int exec_step, int tries, int n_x, int n_y,
 #else
   sprintf (tmp, "%c/%c", dp, cc);
   gdImageString (im, gdft, x3 + gd_try_xoff, y3 + gd_try_yoff + gdft->h - 1,
-		 tmp, gd_grey [gd_try_dcol]);
+		 (unsigned char *) tmp,
+		 gd_grey [gd_try_dcol]);
 #endif
 
   gd_try_dcol = (gd_try_dcol + 1) % 8;
@@ -1055,7 +1057,7 @@ gd_action (int p_x, int p_y, int n_x, int n_y, int a_x, int a_y, char *msg)
     y3 = (y2 + y3) / 2 - gdft->h / 2 - 1;
   }
 
-  gdImageString (im, gdft, x3, y3, msg, gd_black);
+  gdImageString (im, gdft, x3, y3, (unsigned char *) msg, gd_black);
 }
 
 #endif /* GD */
@@ -1105,7 +1107,7 @@ read_png (char *fname)
   }
 
   if (! in || (rc = fread (header, 1, 8, in)) != 8
-      || png_sig_cmp (header, 0, 8) != 0) {
+      || png_sig_cmp ((unsigned char *) header, 0, 8) != 0) {
     return -1;
   }
 
@@ -1291,7 +1293,7 @@ int
 read_ppm (char *fname)
 {
   FILE *in;
-  unsigned char line [1024];
+  char line [1024];
   int ppm_type = 0;
   int i, j, width, height, ncol;
 
@@ -2128,7 +2130,8 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       if (num_stack < 1) {
 	tprintf ("info: out(char) failed: stack underflow \n");
       } else {
-	printf ("%c", stack [num_stack - 1] & 0xff); fflush (stdout);
+	printf ("%c", (int) (stack [num_stack - 1] & 0xff));
+	fflush (stdout);
 	if (trace || debug) {
 	  /* increase readability: */
 	  tprintf ("\n");

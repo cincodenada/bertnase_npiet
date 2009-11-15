@@ -1,7 +1,7 @@
 %{
 /*
  * npiet-foogol.y:					Jun 2004
- * (schoenfr@web.de)					Jan 2005
+ * (schoenfr@web.de)					Nov 2009
  *
  * This file is part of npiet.
  *
@@ -31,10 +31,14 @@
  *      echo 'begin prints ("Hello World!\n") end' | npiet-foogol -
  *      npiet npiet-foogol.png
  *
+ * please note, npiet-foogol uses the libgd library.  on debian it is
+ * avail by ``apt-get install libgd2-xpm-dev'' and bison can be
+ * installed via ``apt-get install bison''.
+ *
  * Have fun.
  */
 
-char *version = "v1.1";
+char *version = "v1.1a";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -610,8 +614,8 @@ dump_decls (char *off, a_decl *decl)
     return;
   }
 
-  dprintf ("%s  decl: %s  off: %d  (block 0x%08x)\n", off, decl->var, 
-	  decl->off, (unsigned) decl->block);
+  dprintf ("%s  decl: %s  off: %d  (block 0x%08lx)\n", off, decl->var, 
+	  decl->off, (unsigned long) decl->block);
     
   dump_decls (off, decl->next);
 }
@@ -673,7 +677,7 @@ void
 dump_blocks (char *off, a_block *block)
 {
   if (block) {
-    printf ("%s  block: 0x%08x\n", off, (unsigned) block);
+    printf ("%s  block: 0x%08lx\n", off, (unsigned long) block);
     
     dump_decls (off, block->decl);
     dump_nodes (off, block->node);
@@ -1526,7 +1530,7 @@ gen_block (a_block *block, a_img *img, int *y_max)
     return 0;
   }
 
-  dprintf ("gen block: 0x%08x\n", (unsigned) block);
+  dprintf ("gen block: 0x%08lx\n", (unsigned long) block);
   
   if (! img) {
     img_init (&img);
@@ -1752,8 +1756,8 @@ begin
 	    a_block *n = calloc (1, sizeof (a_block));
 	    n->parent = curr_block;
 	    /* initialize offset with currect offset: */
-	    d2printf ("** curr_block 0x%08x  off %d\n", 
-		      (unsigned) curr_block, 
+	    d2printf ("** curr_block 0x%08lx  off %d\n", 
+		      (unsigned long) curr_block, 
 		      curr_block ? curr_block->d_off : 0);
 	    n->d_off = curr_block ? curr_block->d_off : 0;
 	    curr_block = n;
