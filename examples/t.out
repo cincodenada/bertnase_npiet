@@ -1,0 +1,113 @@
+**
+** running: npiet nprime.gif:
+**
+-- output start --
+? Y
+-- output end --
+
+**
+** running: npiet nprime.ppm:
+**
+-- output start --
+? N
+-- output end --
+
+**
+** running: npiet loop.gif:
+**
+-- output start --
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+-- output end --
+
+**
+** running: npiet loop.ppm:
+**
+-- output start --
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+-- output end --
+
+**
+** running: npiet nhello.ppm:
+**
+-- output start --
+hello world!
+-- output end --
+
+**
+** running: npiet hi.png:
+**
+-- output start --
+Hi
+-- output end --
+
+**
+** running: npiet hi.ppm:
+**
+-- output start --
+Hi
+-- output end --
+
+**
+** running: npiet nfib.png:
+**
+-- output start --
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+144
+233
+377
+610
+987
+-- output end --
+
+**
+** running: npiet nfib.ppm:
+**
+-- output start --
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+144
+233
+377
+610
+987
+-- output end --
+

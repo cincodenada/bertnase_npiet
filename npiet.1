@@ -1,4 +1,4 @@
-.TH NPIET 1 "Mar 2006" "npiet v1.0a"
+.TH NPIET 1 "Jan 2010" "npiet v1.2"
 .SH NAME
 npiet \- an interpreter for the piet programming language
 .SH SYNOPSIS
@@ -12,7 +12,7 @@ npiet \- an interpreter for the piet programming language
 |
 .B \-dpbug
 |
-.B \-v1
+.B \-v11
 |
 .B \-t
 ]
@@ -72,9 +72,9 @@ print debug output (lot's of more or less cryptic and mostly useless blurb).
 model the perl piet interpreter. This changes the behavior when
 crossing white blocks (wrong interpretation of blocking after white).
 .TP
-.B \-v1
-model the nperl version 1.0 interpreter. This changes to the old
-behavior when crossing white blocks.
+.B \-v11
+model the npiet version 1.1 interpreter. This changes to the first
+fixed version of corrected behavior when crossing white blocks.
 .TP
 .B \-t
 print trace details.  For every step the interpreter print some details:
@@ -126,6 +126,10 @@ Note: this does not stop or change the program execution or the textual trace ou
 .B inputfile
 The picture to read. For ppm-formatted pictures this may be a - to read from
 <stdin>.
+.SH EXAMPLES
+.B "npiet -tpic hello.gif"
+- run the hello.gif program and create a trace file named 
+.I npiet-trace.png .
 .SH FILES
 .B "npiet-trace.png"
 - name of the trace picture file. It is overwritten if it exists.

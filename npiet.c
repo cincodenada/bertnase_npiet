@@ -1,6 +1,6 @@
 /*
  * npiet.c:						May 2004
- * (schoenfr@web.de)					Nov 2009
+ * (schoenfr@web.de)					Jan 2010
  *
  * npiet is an interperter for the piet programming language.
  * 
@@ -54,7 +54,7 @@
  *
  */
 
-char *version = "v1.1a";
+char *version = "v1.2";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -159,14 +159,13 @@ int pp_size = 49;
 /* work around broken source (wrong assumption about toggle of dp and cc): */
 int toggle_bug = 0;
 
-/* work around broken source (wrong interpretation of blocking after white): */
-int white_bug = 0;
-
 /* fun-stuff: create commands to print a string: */
 char *do_n_str = 0;
 
-/* fall back to npiet v1.0 behavior (pre changed white codel crossing): */
-int version_1 = 0;
+/* fall back to npiet v1.1 behavior (fixed white codel crossing but
+ * without trace info: 
+ */
+int version_11 = 0;
 
 /* helper: */
 #define dprintf		if (debug) printf
@@ -202,11 +201,10 @@ parse_args (int argc, char **argv)
     } else if (! strcmp (argv [0], "-dpbug")) {
       /* just a tbd (how to follow wrong behavior ;-) */
       toggle_bug = 1;
-      white_bug = 1;
       vprintf ("info: setting toggle bug and white bug behavior\n");
-    } else if (! strcmp (argv [0], "-v1")) {
-      version_1 = 1;
-      vprintf ("info: setting npiet version 1 behavior\n");
+    } else if (! strcmp (argv [0], "-v11")) {
+      version_11 = 1;
+      vprintf ("info: setting npiet version 1.1 behavior\n");
     } else if (! strcmp (argv [0], "-tpic")) {
 #ifndef HAVE_GD_H
       printf ("note: no GD support compiled in. the graphical trace "
@@ -862,7 +860,9 @@ gd_save ()
 }
 
 
-
+/*
+ * like gd_try_step but with p(ixel)p(ainting) for smaller output size:
+ */
 void
 gd_try_step_pp (int try, int n_x, int n_y, int dp, int cc)
 {
@@ -933,7 +933,9 @@ gd_try_step_pp (int try, int n_x, int n_y, int dp, int cc)
 }
 
 
-
+/*
+ * paint trace info about this try:
+ */
 void
 gd_try_step (int exec_step, int tries, int n_x, int n_y,
 	    int dp, int cc)
@@ -1645,7 +1647,32 @@ piet_walk_border (int *n_x, int *n_y, int *num_cells)
 	    *n_x, *n_y, p_dir_pointer, p_codel_chooser);
 
   return 0; 
+}
 
+int
+piet_walk_white (int *n_x, int *n_y)
+{
+  int c_col, a_x = *n_x, a_y = *n_y;
+
+  dprintf ("info: walk_white 1: n_x=%d, n_y=%d, n_dp=%c, n_cc=%c\n",
+	   *n_x, *n_y, p_dir_pointer, p_codel_chooser);
+  
+  c_col = get_cell (p_xpos, p_ypos);
+
+  while (c_col == c_white) {
+    dprintf ("deb: white cell passed to %d, %d\n", a_x, a_y);
+    a_x += dp_dx (p_dir_pointer);
+    a_y += dp_dy (p_dir_pointer);
+    c_col = get_cell (a_x, a_y);
+  }
+
+  *n_x = a_x;
+  *n_y = a_y;
+
+  dprintf ("info: walk_border 2: n_x=%d, n_y=%d, n_dp=%c, n_cc=%c\n",
+	    *n_x, *n_y, p_dir_pointer, p_codel_chooser);
+
+  return 0; 
 }
 
 
@@ -2155,7 +2182,11 @@ piet_step ()
   int pre_xpos, pre_ypos;
   int c_col, a_col, num_cells;
   char msg [128];
+  // a noop from a white codel:
   int white_crossed = 0;
+  // flag about white to white crossing:
+  int in_white = 0;
+
   /* hmm - maybe we can simulate other piet dialect this way: */
   static int p_toggle = 0;
 
@@ -2188,9 +2219,7 @@ piet_step ()
     p_toggle = 0;
   }
 
-  if (white_bug) {
-    white_crossed = (c_col == c_white);
-  }
+  white_crossed = (c_col == c_white);
 
   /* save for trace output: */
   pre_xpos = p_xpos;
@@ -2216,10 +2245,12 @@ piet_step ()
     n_x = p_xpos;
     n_y = p_ypos;
 
-    if (!white_bug && c_col == c_white) {
+    if (c_col == c_white) {
+
       /* head on: */
       if (tries == 0) {
-	tprintf ("trace: special case: we started at a white codel - continuing\n");
+	tprintf ("trace: special case: we at a white codel"
+		 " - continuing\n");
       }
       num_cells = 1;
     } else {
@@ -2261,7 +2292,7 @@ piet_step ()
      *    If the transition between colour blocks occurs via a slide
      *    across a white block, no command is executed.
      */
-    if ((!white_bug && c_col == c_white) || a_col == c_white) {
+    if (a_col == c_white) {
       while (a_col == c_white) {
 	dprintf ("deb: white cell passed to %d, %d (now col_idx %d)\n",
 		 a_x, a_y, a_col);
@@ -2281,15 +2312,16 @@ piet_step ()
          * the Perl Piet interpreter sets the white block as the current
          * block. The Tower of Hanoi example relies on this behaviour.
          */
-        if (white_bug) {
-          white_crossed = 1;
-          a_col = c_white;
-          a_x -= dp_dx (p_dir_pointer);
-          a_y -= dp_dy (p_dir_pointer);
-          tprintf("trace: entering white block at %d,%d (like the perl "
-                  "interpreter would)...\n", a_x, a_y);
-        }
-	else if (! version_1) {
+	if (version_11) {
+	  /*
+	   * patch from Yusuke ENDOH <mame@tsg.ne.jp>
+	   *
+   	   * ``According to `Clarification of white block behaviour
+	   *   (added 25 January, 2008)' in the Piet specification [1],
+	   *   when sliding into a black block, the interpreter must
+	   *   not stay in the coloured block but move to the white
+	   *   block. But the current behaviour of npiet is `stay'.''
+	   */
 	  int *visited = NULL, visited_len = 0, i;
 	  white_crossed = 1;
 	  while (a_col < 0 || a_col == c_black) {
@@ -2298,6 +2330,7 @@ piet_step ()
 	    a_y -= dp_dy (p_dir_pointer);
 	    tprintf("trace: hitting black block when sliding at %d,%d %c %c\n",
 		    a_x, a_y, p_codel_chooser, p_dir_pointer);
+
 	    p_codel_chooser = toggle_cc(p_codel_chooser);
 	    p_dir_pointer = turn_dp(p_dir_pointer);
 
@@ -2326,17 +2359,36 @@ piet_step ()
 	    }
 	  }
 	  if (visited) free(visited);
-	}
+	} else {
+          white_crossed = 1;
+          a_col = c_white;
+          a_x -= dp_dx (p_dir_pointer);
+          a_y -= dp_dy (p_dir_pointer);
+          tprintf("trace: entering white block at %d,%d (like the perl "
+                  "interpreter would)...\n", a_x, a_y);
+        }
       }
     }
 
     if (a_col < 0 || a_col == c_black) {
-      if ((p_toggle % 2) == 0) {
+      /*
+       * we hit something black or a wall:
+       */
+      if (c_col == c_white || in_white) {
+	// toggle dp and cc:
 	p_codel_chooser = toggle_cc(p_codel_chooser);
-	dprintf ("deb: toggle cc to '%c'\n", p_codel_chooser);
-      } else {
 	p_dir_pointer = turn_dp(p_dir_pointer);
+	dprintf ("deb: in white codel - toggle both dp and cc\n");
+	dprintf ("deb: toggle cc to '%c'\n", p_codel_chooser);
 	dprintf ("deb: toggle dp to '%c'\n", p_dir_pointer);
+      } else {
+	if ((p_toggle % 2) == 0) {
+	  p_codel_chooser = toggle_cc(p_codel_chooser);
+	  dprintf ("deb: toggle cc to '%c'\n", p_codel_chooser);
+	} else {
+	  p_dir_pointer = turn_dp(p_dir_pointer);
+	  dprintf ("deb: toggle dp to '%c'\n", p_dir_pointer);
+	}
       }
       p_toggle++;
 
