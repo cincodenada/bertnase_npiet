@@ -54,7 +54,7 @@
  *
  */
 
-char *version = "v1.2";
+char *version = "v1.2a";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,7 +114,7 @@ usage (int rc)
   fprintf (stderr, "\t-n-str <s> - nase stuff: string-to-command\n");
   fprintf (stderr, "\t-d         - debug (default: off)\n");
   fprintf (stderr, "\t-dpbug     - model the perl piet interpreter (default: off)\n");
-  fprintf (stderr, "\t-v1        - model the npiet v1.0 interpreter (default: off)\n");
+  fprintf (stderr, "\t-v11       - model the npiet v1.1 interpreter (default: off)\n");
 
   exit (rc);
 }
