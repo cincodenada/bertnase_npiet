@@ -1,7 +1,7 @@
 %{
 /*
  * npiet-foogol.y:					Jun 2004
- * (schoenfr@web.de)					Nov 2009
+ * (schoenfr@web.de)					Mar 2011
  *
  * This file is part of npiet.
  *
@@ -38,7 +38,7 @@
  * Have fun.
  */
 
-char *version = "v1.1a";
+char *version = "v1.2b";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1773,14 +1773,14 @@ end
 block
 	: begin decl ';' stmt_list
 	  { 
-	    curr_block->node = $4;
-	    $$ = curr_block;
+	    curr_block->node = $<node>4;
+	    $<block>$ = curr_block;
 	  }
 	  end
 	| begin stmt_list
 	  {
-	    curr_block->node = $2;
-	    $$ = curr_block;
+	    curr_block->node = $<node>2;
+	    $<block>$ = curr_block;
 	  }
 	  end
 	;
@@ -1936,7 +1936,9 @@ yylex ()
   /* number: */
   if (isdigit (c)) {
     ungetc (c, f_in);
-    fscanf (f_in, "%ld", &yylval.num);
+    if (1 != fscanf (f_in, "%ld", &yylval.num)) {
+      yyerror ("cannot scan integer value");
+    }
     return NUM;
   }
 
