@@ -1,4 +1,4 @@
-.TH NPIET-FOOGOL 1 "May 2004" "npiet v0.9"
+.TH NPIET-FOOGOL 1 "Aug 2011" "npiet v1.3"
 .SH NAME
 npiet-foogol \- a foogol to piet compiler
 .SH SYNOPSIS
@@ -11,6 +11,8 @@ npiet-foogol \- a foogol to piet compiler
 .BI "-w" " <n>"
 ] [
 .BI "-b" " <n>"
+] [
+.BI "-cs" " <n>"
 ]
 .I inputfile
 .SH DESCRIPTION
@@ -48,6 +50,17 @@ represents a number.  To be able to push a large number on the stack
 without wasting a lot of ink, the number is calculated and the given
 base is used to do so.
 
+.TP
+.B \-cs <n>
+Sets the output codel size to n pixels. The default is 1.
+Use a higher value to get a larger output picture.
+
+.TP
+.B \-rnd
+Experimental feature to set the start codel not always to red, but to
+a somewhat more random value.  This does not work reliable - please
+avoid if running in trouble...
+
 .B \-o <filename>
 Sets the output filename.  Default is npiet-foogol.png.
 .TP
@@ -66,5 +79,3 @@ Surely lots.
 .BR npietedit(1)
 .br
 .B "http://www.bertnase.de/npiet/"
-.br
-.B "http://www.gaertner.de/html/foogol.html"

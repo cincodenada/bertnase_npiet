@@ -72,7 +72,7 @@
 
 /*
  * npiet-foogol.y:					Jun 2004
- * (schoenfr@web.de)					Mar 2011
+ * (schoenfr@web.de)					Aug 2011
  *
  * This file is part of npiet.
  *
@@ -109,13 +109,14 @@
  * Have fun.
  */
 
-char *version = "v1.2b";
+char *version = "v1.3";
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
 #include <limits.h>
+#include <time.h>
 
 #include <gd.h>
 #include <gdfonts.h>
@@ -130,6 +131,11 @@ char *ofname = "npiet-foogol.png";
 /* base factor for number generation: */
 int smart_base = 7;			/* just try a funny value */
 
+/* codel size: */
+int codel_size = 1;
+
+/* use random color at startup (opposite to pre v1.3 behavior): */
+int random_color = 0;
 
 void
 usage (int rc)
@@ -143,6 +149,10 @@ usage (int rc)
   fprintf (stderr, "\t-d         - print debug messages (default: off)\n");
   fprintf (stderr, "\t-w <n>     - wrap pixel width (default: %d)\n", WRAP_W);
   fprintf (stderr, "\t-b <n>     - smart number generation base (default: %d)\n", smart_base);
+  fprintf (stderr, "\t-cs <n>     - codel size of output (default: %d)\n",
+           codel_size);
+  fprintf (stderr, "\t-rnd        - not only red color on startup,\n");
+  fprintf (stderr, "\t              use a random codel (experimental)\n");
   fprintf (stderr, "\t-o <filename> - output file (default: %s)\n", ofname);
 
   exit (rc);
@@ -208,6 +218,21 @@ parse_args (int argc, char **argv)
 	smart_base = 7;
       }
       vprintf ("info: smart base set to %d\n", smart_base);
+    } else if (argc > 0 && ! strcmp (argv [0], "-cs")) {
+      argc--, argv++;		/* shift */
+      codel_size = atoi (argv [0]);
+      if (codel_size < 1) {
+	fprintf (stderr, 
+		 "warning: codel size %d < 1 looks a bit odd - using 1\n",
+		 codel_size);
+	codel_size = 1;
+      }
+      vprintf ("info: codel size set to %d\n", codel_size);
+    } else if (argc > 0 && ! strcmp (argv [0], "-rnd")) {
+      random_color = 1;
+      vprintf ("info: using  random codel colors - very experimental...\n");
+      /* init the random number generator - some secs should be good enough: */
+      srand (time ((time_t *) 0) % 32768);
     } else if (argc > 0 && ! strcmp (argv [0], "-o")) {
       argc--, argv++;		/* shift */
       ofname = argv [0];
@@ -428,6 +453,21 @@ static struct c_color {
 };
 
 
+/*
+ * choose 6 == red as default start color or a random value:
+ */
+int startup_color ()
+{
+  if (random_color == 0) {
+    return 6;				/* red */
+  } else {
+    /* choose something between 6 (red) and 11 (margenta): */
+    return 6 + (rand () % 4);
+  }
+}
+
+
+
 void
 img_resize (a_img *img, int w, int h)
 {
@@ -534,7 +574,7 @@ img_init (a_img **imgp)
   img->wrap_w = wrap_wm;
 
   /* initial pixel: */
-  img->col = 6;			/* red */
+  img->col = startup_color ();		/* random or red */
   img->x = 0; 
   img->y = 0;
 
@@ -559,7 +599,23 @@ save_img (a_img *img)
   if (! (out = fopen (ofname, "wb"))) {
     perror ("cannot open for writing; reason");
   } else {
-    gdImagePng (img->im, out);
+
+    if (codel_size > 1) {
+      /*
+       * resize first: 
+       */
+      gdImagePtr im = gdImageCreate (img->w * codel_size, img->h * codel_size);
+
+      gdImageCopyResized (im, img->im, 
+			  0, 0, 
+			  0, 0, 
+			  img->w * codel_size, img->h * codel_size,
+			  img->w, img->h);
+
+      gdImagePng (im, out);      
+    } else {
+      gdImagePng (img->im, out);
+    }
     fclose (out);
     if (! quiet) {
       fprintf (stderr, "output saved to %s\n", ofname);
@@ -764,7 +820,7 @@ gen_cmd_nowrap (a_img *img, int h, int l)
   if (img->y > 0 && get_pixel (img, img->x + img->dx, img->y - 1) == cc) {
     /* color clash - set new mark and look about valid colors: */
     img->x += 2 * img->dx;
-    c1 = 6;			/* start cycle with red */
+    c1 = startup_color ();	/* start cycle with random or red */
     cc = adv_col (c1, h, l);
 
     while (get_pixel (img, img->x, img->y - 1) == c1
@@ -803,7 +859,7 @@ gen_codel (a_img *img, int col)
 {
   if (col == -1) {
     /* choose a color not matching the codel above: */
-    img->col = 6;		/* choose red as the default color */
+    img->col = startup_color ();    /* choose random or red */
     while (img->y > 0 && get_pixel (img, img->x, img->y - 1) == img->col) {
       img->col++;
     }
@@ -1344,7 +1400,15 @@ gen_nodes (a_img *img, a_block *p_block, a_node *node, int *y_max)
 
     img->x = b_x + 2;
     img->y = b_y + 2;
+    /* 
+     * v1.3 experimental random_color selection may fail here (at least
+     * withe the 99-bottels.foo test - nomen est omen ;-)
+     */
+#if 0
+    img->col = startup_color (); 
+#else
     img->col = 6;
+#endif
     set_pixel (img, img->x, img->y, img->col);
 
     s_depth -= 1;
@@ -1720,7 +1784,7 @@ new_if_stmt (a_expr *expr, a_node *node1, a_node *node2)
 
 
 /* Line 189 of yacc.c  */
-#line 1724 "npiet-foogol.c"
+#line 1788 "npiet-foogol.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -1772,7 +1836,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 1657 "npiet-foogol.y"
+#line 1721 "npiet-foogol.y"
 
   long num;
   char *str;
@@ -1783,7 +1847,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 1787 "npiet-foogol.c"
+#line 1851 "npiet-foogol.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -1795,7 +1859,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 1799 "npiet-foogol.c"
+#line 1863 "npiet-foogol.c"
 
 #ifdef short
 # undef short
@@ -2096,11 +2160,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,  1688,  1688,  1689,  1695,  1703,  1705,  1714,  1716,  1718,
-    1724,  1726,  1728,  1730,  1732,  1734,  1736,  1738,  1740,  1749,
-    1754,  1769,  1775,  1774,  1781,  1780,  1790,  1793,  1795,  1801,
-    1806,  1811,  1813,  1818,  1820,  1822,  1832,  1834,  1836,  1846,
-    1848,  1850,  1859,  1861,  1867,  1876
+       0,  1752,  1752,  1753,  1759,  1767,  1769,  1778,  1780,  1782,
+    1788,  1790,  1792,  1794,  1796,  1798,  1800,  1802,  1804,  1813,
+    1818,  1833,  1839,  1838,  1845,  1844,  1854,  1857,  1859,  1865,
+    1870,  1875,  1877,  1882,  1884,  1886,  1896,  1898,  1900,  1910,
+    1912,  1914,  1923,  1925,  1931,  1940
 };
 #endif
 
@@ -3064,35 +3128,35 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 1688 "npiet-foogol.y"
+#line 1752 "npiet-foogol.y"
     { yyerror ("no vaild input found"); ;}
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 1690 "npiet-foogol.y"
+#line 1754 "npiet-foogol.y"
     { root_block = (yyvsp[(1) - (1)].block); ;}
     break;
 
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 1696 "npiet-foogol.y"
+#line 1760 "npiet-foogol.y"
     { (yyval.str) = (yyvsp[(1) - (1)].str); ;}
     break;
 
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 1704 "npiet-foogol.y"
+#line 1768 "npiet-foogol.y"
     { (yyval.expr) = new_expr (e_num); (yyval.expr)->num = (yyvsp[(1) - (1)].num); ;}
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 1706 "npiet-foogol.y"
+#line 1770 "npiet-foogol.y"
     { 
 		  (yyval.expr) = new_expr (e_var); 
 		  if (! find_decl ((yyvsp[(1) - (1)].str), curr_block)) {
@@ -3106,21 +3170,21 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 1715 "npiet-foogol.y"
+#line 1779 "npiet-foogol.y"
     { (yyval.expr) = (yyvsp[(2) - (3)].expr); ;}
     break;
 
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 1717 "npiet-foogol.y"
+#line 1781 "npiet-foogol.y"
     { (yyval.expr) = (yyvsp[(2) - (2)].expr); ;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 1719 "npiet-foogol.y"
+#line 1783 "npiet-foogol.y"
     { 
 		  a_expr *e = new_expr (e_num); 
 		  e->num = 0;
@@ -3131,77 +3195,77 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 1725 "npiet-foogol.y"
+#line 1789 "npiet-foogol.y"
     { (yyval.expr) = new_biop_expr (e_op, (yyvsp[(1) - (3)].expr), '*', (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 1727 "npiet-foogol.y"
+#line 1791 "npiet-foogol.y"
     { (yyval.expr) = new_biop_expr (e_op, (yyvsp[(1) - (3)].expr), '/', (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 1729 "npiet-foogol.y"
+#line 1793 "npiet-foogol.y"
     { (yyval.expr) = new_biop_expr (e_op, (yyvsp[(1) - (3)].expr), '+', (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 1731 "npiet-foogol.y"
+#line 1795 "npiet-foogol.y"
     { (yyval.expr) = new_biop_expr (e_op, (yyvsp[(1) - (3)].expr), '-', (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 1733 "npiet-foogol.y"
+#line 1797 "npiet-foogol.y"
     { (yyval.expr) = new_biop_expr (e_op, (yyvsp[(2) - (2)].expr), '!', 0); ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 1735 "npiet-foogol.y"
+#line 1799 "npiet-foogol.y"
     { (yyval.expr) = new_biop_expr (e_op, (yyvsp[(1) - (3)].expr), '>', (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 1737 "npiet-foogol.y"
+#line 1801 "npiet-foogol.y"
     { (yyval.expr) = new_biop_expr (e_op, (yyvsp[(3) - (3)].expr), '>', (yyvsp[(1) - (3)].expr)); ;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 1739 "npiet-foogol.y"
+#line 1803 "npiet-foogol.y"
     { (yyval.expr) = new_biop_expr (e_op, (yyvsp[(1) - (3)].expr), '=', (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 1741 "npiet-foogol.y"
+#line 1805 "npiet-foogol.y"
     { (yyval.expr) = new_biop_expr (e_op, (yyvsp[(1) - (3)].expr), '#', (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 1750 "npiet-foogol.y"
+#line 1814 "npiet-foogol.y"
     { (yyval.block) = (yyvsp[(1) - (1)].block); ;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 1755 "npiet-foogol.y"
+#line 1819 "npiet-foogol.y"
     {
 	    a_block *n = calloc (1, sizeof (a_block));
 	    n->parent = curr_block;
@@ -3218,14 +3282,14 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 1770 "npiet-foogol.y"
+#line 1834 "npiet-foogol.y"
     { curr_block = curr_block->parent; ;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 1775 "npiet-foogol.y"
+#line 1839 "npiet-foogol.y"
     { 
 	    curr_block->node = (yyvsp[(4) - (4)].node);
 	    (yyval.block) = curr_block;
@@ -3235,7 +3299,7 @@ yyreduce:
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 1781 "npiet-foogol.y"
+#line 1845 "npiet-foogol.y"
     {
 	    curr_block->node = (yyvsp[(2) - (2)].node);
 	    (yyval.block) = curr_block;
@@ -3245,21 +3309,21 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 1794 "npiet-foogol.y"
+#line 1858 "npiet-foogol.y"
     { new_decl ((yyvsp[(1) - (3)].str), curr_block); ;}
     break;
 
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 1796 "npiet-foogol.y"
+#line 1860 "npiet-foogol.y"
     { new_decl ((yyvsp[(1) - (1)].str), curr_block); ;}
     break;
 
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 1802 "npiet-foogol.y"
+#line 1866 "npiet-foogol.y"
     {
 	    (yyvsp[(1) - (3)].node)->next = (yyvsp[(3) - (3)].node);
 	    (yyval.node) = (yyvsp[(1) - (3)].node);
@@ -3269,42 +3333,42 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 1807 "npiet-foogol.y"
+#line 1871 "npiet-foogol.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 1812 "npiet-foogol.y"
+#line 1876 "npiet-foogol.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 1814 "npiet-foogol.y"
+#line 1878 "npiet-foogol.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 1819 "npiet-foogol.y"
+#line 1883 "npiet-foogol.y"
     { (yyval.node) = new_if_stmt ((yyvsp[(2) - (4)].expr), (yyvsp[(4) - (4)].node), 0); ;}
     break;
 
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 1821 "npiet-foogol.y"
+#line 1885 "npiet-foogol.y"
     { (yyval.node) = new_if_stmt ((yyvsp[(2) - (6)].expr), (yyvsp[(4) - (6)].node), (yyvsp[(6) - (6)].node)); ;}
     break;
 
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 1823 "npiet-foogol.y"
+#line 1887 "npiet-foogol.y"
     {
 	    a_node *n = new_node (n_while);
 	    n->arg1 = (yyvsp[(2) - (4)].expr);
@@ -3316,21 +3380,21 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 1833 "npiet-foogol.y"
+#line 1897 "npiet-foogol.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 1835 "npiet-foogol.y"
+#line 1899 "npiet-foogol.y"
     { (yyval.node) = new_if_stmt ((yyvsp[(2) - (6)].expr), (yyvsp[(4) - (6)].node), (yyvsp[(6) - (6)].node)); ;}
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 1837 "npiet-foogol.y"
+#line 1901 "npiet-foogol.y"
     {
 	    a_node *n = new_node (n_while);
 	    n->arg1 = (yyvsp[(2) - (4)].expr);
@@ -3342,21 +3406,21 @@ yyreduce:
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 1847 "npiet-foogol.y"
+#line 1911 "npiet-foogol.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 40:
 
 /* Line 1455 of yacc.c  */
-#line 1849 "npiet-foogol.y"
+#line 1913 "npiet-foogol.y"
     { (yyval.node) = (yyvsp[(1) - (1)].node); ;}
     break;
 
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 1851 "npiet-foogol.y"
+#line 1915 "npiet-foogol.y"
     { 
 	    a_node *n = new_node (n_block);
 	    n->block = (yyvsp[(1) - (1)].block);
@@ -3367,14 +3431,14 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 1860 "npiet-foogol.y"
+#line 1924 "npiet-foogol.y"
     { (yyval.node) = new_node (n_print); ;}
     break;
 
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 1862 "npiet-foogol.y"
+#line 1926 "npiet-foogol.y"
     {
 	    a_node *n = new_node (n_prints);
 	    n->str = (yyvsp[(3) - (4)].str);
@@ -3385,7 +3449,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 1868 "npiet-foogol.y"
+#line 1932 "npiet-foogol.y"
     {
 	    a_node *n = new_node (n_printn);
 	    n->arg1 = (yyvsp[(3) - (4)].expr);
@@ -3396,7 +3460,7 @@ yyreduce:
   case 45:
 
 /* Line 1455 of yacc.c  */
-#line 1877 "npiet-foogol.y"
+#line 1941 "npiet-foogol.y"
     {
 	    a_node *n = new_node (n_assign);
 	    n->var = (yyvsp[(1) - (4)].str);
@@ -3412,7 +3476,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 3416 "npiet-foogol.c"
+#line 3480 "npiet-foogol.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3624,7 +3688,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 1889 "npiet-foogol.y"
+#line 1953 "npiet-foogol.y"
 
 
 

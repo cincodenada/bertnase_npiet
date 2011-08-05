@@ -27,7 +27,7 @@ DEFS = -DHAVE_CONFIG_H
 ## Flags for debugging and production:
 ##
 # FLAGS = -O
-FLAGS = -g -O
+FLAGS = -g -O2
 # LDFLAGS =
 LDFLAGS = -g
 
@@ -35,7 +35,7 @@ LDFLAGS = -g
 # PROF = -pg
 
 ## win cygwin static flag:
-# -mno-cygwin -static
+# CYG = -mno-cygwin -static
 
 ##
 ## libraries:
@@ -60,7 +60,7 @@ RM = rm
 ##
 ## Anything else below here should be independent.
 ##
-CFLAGS = $(FLAGS) $(PROF) $(WARN) $(DEFS) $(LIBDIRPATH)
+CFLAGS = $(FLAGS) $(PROF) $(CYG) $(WARN) $(DEFS) $(LIBDIRPATH)
 
 ##
 ## How to build the target:
@@ -102,6 +102,13 @@ npiet-foogol.c:         npiet-foogol.y
 
 ftest:	npiet-foogol
 	./npiet-foogol a.foo
+
+
+test:	check
+
+check:
+	(cd examples ; make)
+	(cd foo ; make)
 
 ##
 ## installation:

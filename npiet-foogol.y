@@ -1,7 +1,7 @@
 %{
 /*
  * npiet-foogol.y:					Jun 2004
- * (schoenfr@web.de)					Mar 2011
+ * (schoenfr@web.de)					Aug 2011
  *
  * This file is part of npiet.
  *
@@ -38,13 +38,14 @@
  * Have fun.
  */
 
-char *version = "v1.2b";
+char *version = "v1.3";
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
 #include <limits.h>
+#include <time.h>
 
 #include <gd.h>
 #include <gdfonts.h>
@@ -59,6 +60,11 @@ char *ofname = "npiet-foogol.png";
 /* base factor for number generation: */
 int smart_base = 7;			/* just try a funny value */
 
+/* codel size: */
+int codel_size = 1;
+
+/* use random color at startup (opposite to pre v1.3 behavior): */
+int random_color = 0;
 
 void
 usage (int rc)
@@ -72,6 +78,10 @@ usage (int rc)
   fprintf (stderr, "\t-d         - print debug messages (default: off)\n");
   fprintf (stderr, "\t-w <n>     - wrap pixel width (default: %d)\n", WRAP_W);
   fprintf (stderr, "\t-b <n>     - smart number generation base (default: %d)\n", smart_base);
+  fprintf (stderr, "\t-cs <n>     - codel size of output (default: %d)\n",
+           codel_size);
+  fprintf (stderr, "\t-rnd        - not only red color on startup,\n");
+  fprintf (stderr, "\t              use a random codel (experimental)\n");
   fprintf (stderr, "\t-o <filename> - output file (default: %s)\n", ofname);
 
   exit (rc);
@@ -137,6 +147,21 @@ parse_args (int argc, char **argv)
 	smart_base = 7;
       }
       vprintf ("info: smart base set to %d\n", smart_base);
+    } else if (argc > 0 && ! strcmp (argv [0], "-cs")) {
+      argc--, argv++;		/* shift */
+      codel_size = atoi (argv [0]);
+      if (codel_size < 1) {
+	fprintf (stderr, 
+		 "warning: codel size %d < 1 looks a bit odd - using 1\n",
+		 codel_size);
+	codel_size = 1;
+      }
+      vprintf ("info: codel size set to %d\n", codel_size);
+    } else if (argc > 0 && ! strcmp (argv [0], "-rnd")) {
+      random_color = 1;
+      vprintf ("info: using  random codel colors - very experimental...\n");
+      /* init the random number generator - some secs should be good enough: */
+      srand (time ((time_t *) 0) % 32768);
     } else if (argc > 0 && ! strcmp (argv [0], "-o")) {
       argc--, argv++;		/* shift */
       ofname = argv [0];
@@ -357,6 +382,21 @@ static struct c_color {
 };
 
 
+/*
+ * choose 6 == red as default start color or a random value:
+ */
+int startup_color ()
+{
+  if (random_color == 0) {
+    return 6;				/* red */
+  } else {
+    /* choose something between 6 (red) and 11 (margenta): */
+    return 6 + (rand () % 4);
+  }
+}
+
+
+
 void
 img_resize (a_img *img, int w, int h)
 {
@@ -463,7 +503,7 @@ img_init (a_img **imgp)
   img->wrap_w = wrap_wm;
 
   /* initial pixel: */
-  img->col = 6;			/* red */
+  img->col = startup_color ();		/* random or red */
   img->x = 0; 
   img->y = 0;
 
@@ -488,7 +528,23 @@ save_img (a_img *img)
   if (! (out = fopen (ofname, "wb"))) {
     perror ("cannot open for writing; reason");
   } else {
-    gdImagePng (img->im, out);
+
+    if (codel_size > 1) {
+      /*
+       * resize first: 
+       */
+      gdImagePtr im = gdImageCreate (img->w * codel_size, img->h * codel_size);
+
+      gdImageCopyResized (im, img->im, 
+			  0, 0, 
+			  0, 0, 
+			  img->w * codel_size, img->h * codel_size,
+			  img->w, img->h);
+
+      gdImagePng (im, out);      
+    } else {
+      gdImagePng (img->im, out);
+    }
     fclose (out);
     if (! quiet) {
       fprintf (stderr, "output saved to %s\n", ofname);
@@ -693,7 +749,7 @@ gen_cmd_nowrap (a_img *img, int h, int l)
   if (img->y > 0 && get_pixel (img, img->x + img->dx, img->y - 1) == cc) {
     /* color clash - set new mark and look about valid colors: */
     img->x += 2 * img->dx;
-    c1 = 6;			/* start cycle with red */
+    c1 = startup_color ();	/* start cycle with random or red */
     cc = adv_col (c1, h, l);
 
     while (get_pixel (img, img->x, img->y - 1) == c1
@@ -732,7 +788,7 @@ gen_codel (a_img *img, int col)
 {
   if (col == -1) {
     /* choose a color not matching the codel above: */
-    img->col = 6;		/* choose red as the default color */
+    img->col = startup_color ();    /* choose random or red */
     while (img->y > 0 && get_pixel (img, img->x, img->y - 1) == img->col) {
       img->col++;
     }
@@ -1273,7 +1329,15 @@ gen_nodes (a_img *img, a_block *p_block, a_node *node, int *y_max)
 
     img->x = b_x + 2;
     img->y = b_y + 2;
+    /* 
+     * v1.3 experimental random_color selection may fail here (at least
+     * withe the 99-bottels.foo test - nomen est omen ;-)
+     */
+#if 0
+    img->col = startup_color (); 
+#else
     img->col = 6;
+#endif
     set_pixel (img, img->x, img->y, img->col);
 
     s_depth -= 1;

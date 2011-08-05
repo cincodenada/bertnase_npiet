@@ -1,4 +1,4 @@
-.TH NPIET 1 "Jan 2010" "npiet v1.2"
+.TH NPIET 1 "Aug 2011" "npiet v1.3"
 .SH NAME
 npiet \- an interpreter for the piet programming language
 .SH SYNOPSIS
@@ -69,12 +69,14 @@ be more quiet.
 print debug output (lot's of more or less cryptic and mostly useless blurb).
 .TP
 .B \-dpbug
-model the perl piet interpreter. This changes the behavior when
-crossing white blocks (wrong interpretation of blocking after white).
+changes the execution mode of the perl piet interpreter.  This changes
+the behavior when crossing white blocks (wrong interpretation of
+blocking after white).
 .TP
 .B \-v11
-model the npiet version 1.1 interpreter. This changes to the first
-fixed version of corrected behavior when crossing white blocks.
+changes the execution mode to the npiet version 1.1 interpreter. This
+changes to the first fixed version of corrected behavior when crossing
+white blocks.
 .TP
 .B \-t
 print trace details.  For every step the interpreter print some details:
@@ -115,6 +117,7 @@ internal values too, where different information is written depending
 of the zoom factor. (only avail if compiled with gd support).
 .TP
 .B \-ts <n>
+Please look at -te <n> just below:
 .TP
 .B \-te <n>
 Values where to start and end when painting a trace picture. To avoid
@@ -122,6 +125,11 @@ clobbered output when running in loops, for better readability a start
 and an end step can be specified.
 .br
 Note: this does not stop or change the program execution or the textual trace output. It affects only the saved image.
+.br
+Note: this enables now tracing, so specifying -tpic is no longer necessary.
+.br
+Note: if you specify -te 0 you can easily get an bigger picture
+of the input saved ;-)
 .TP
 .B inputfile
 The picture to read. For ppm-formatted pictures this may be a - to read from

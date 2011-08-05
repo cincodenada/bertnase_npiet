@@ -54,7 +54,7 @@
  *
  */
 
-char *version = "v1.2a";
+char *version = "v1.3";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -241,12 +241,26 @@ parse_args (int argc, char **argv)
       vprintf ("info: number of execution steps set to %u\n", max_exec_step);
     } else if (argc > 0 && ! strcmp (argv [0], "-ts")) {
       argc--, argv++;		/* shift */
+#ifndef HAVE_GD_H
+      printf ("note: no GD support compiled in. the graphical trace "
+	      "feature is not avail\n");
+#else
       gd_trace_start = atoi (argv [0]);
       vprintf ("info: graphical trace start set to %d\n", gd_trace_start);
+      /* enable graphical tracing anyway: */
+      do_gdtrace = 1; 
+#endif
     } else if (argc > 0 && ! strcmp (argv [0], "-te")) {
       argc--, argv++;		/* shift */
+#ifndef HAVE_GD_H
+      printf ("note: no GD support compiled in. the graphical trace "
+	      "feature is not avail\n");
+#else
       gd_trace_end = atoi (argv [0]);
       vprintf ("info: graphical trace end set to %d\n", gd_trace_end);
+      /* enable graphical tracing anyway: */
+      do_gdtrace = 1; 
+#endif
     } else if (argc > 0 && ! strcmp (argv [0], "-n-str")) {
       argc--, argv++;		/* shift */
       do_n_str = argv [0];
@@ -839,7 +853,10 @@ gd_init ()
   }
 
   /* start circle: */
-  gdImageArc (im, c_xy / 2, c_xy / 2, c_xy / 7, c_xy / 7, 0, 360, gd_black);
+  if (gd_trace_end > 0) {
+    /* set start dot only if something to trace is wanted: */
+    gdImageArc (im, c_xy / 2, c_xy / 2, c_xy / 7, c_xy / 7, 0, 360, gd_black);
+  }
 }
 
 
@@ -2267,7 +2284,7 @@ piet_step ()
 	     "with dp='%c', cc='%c'\n",
 	     tries, a_x, a_y, a_col, p_dir_pointer, p_codel_chooser);
 
-    if (do_gdtrace && ! gd_trace_simple
+    if (do_gdtrace && ! gd_trace_simple && gd_trace_end > 0
 	&& exec_step >= gd_trace_start && exec_step <= gd_trace_end) {
       gd_try_step (exec_step, tries, n_x, n_y, 
 		   p_dir_pointer, p_codel_chooser);
@@ -2417,7 +2434,7 @@ piet_step ()
 	rc = piet_action (c_col, a_col, num_cells, msg);
       } 
       
-      if (do_gdtrace 
+      if (do_gdtrace && gd_trace_end > 0
 	  && exec_step >= gd_trace_start && exec_step <= gd_trace_end) {
 	/* graphical trace output: */	
 	gd_action (pre_xpos, pre_ypos, n_x, n_y, a_x, a_y, msg);

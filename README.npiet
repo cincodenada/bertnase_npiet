@@ -5,11 +5,11 @@
 
 
 
-npiet is an interperter for the piet programming language and
+- npiet is an interperter for the piet programming language and
 
-npietedit is a very simple editor for small piet programs.
+- npietedit is a very simple editor for small piet programs.
 
-npietedit-foogol is a ``foogol to piet'' compiler.
+- npietedit-foogol is a ``foogol to piet'' compiler.
 
 
 about the piet programming language please look at:
@@ -34,7 +34,7 @@ to compile and install npiet and the additional programs and files run
 	make
 	make install
 
-this installes the binaries npiet, npietedit and npiet-foogol,
+this installs the binaries npiet, npietedit and npiet-foogol,
 together with the manpages npiet.1, npietedit.1 and npiet-foogol.1 .
 
 
@@ -61,6 +61,5 @@ Have fun!
 
 
 --
-Sun Nov 15 21:54:08 CET 2009
-
+Fri Aug  5 23:14:42 CEST 2011
 
