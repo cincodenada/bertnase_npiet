@@ -36,11 +36,12 @@ LDFLAGS = -g
 
 ## win cygwin static flag:
 # CYG = -mno-cygwin -static
+# CYG_LIBS = -lgd -lpng -lgif -lz -lm
 
 ##
 ## libraries:
 ##
-LIBS = @LIBS@
+LIBS = @LIBS@ $(CYG_LIBS)
 
 ##
 ## installation commands:
