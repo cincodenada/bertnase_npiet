@@ -44,7 +44,11 @@ trace output can be created by npiet - great fun ;-)
 
 npietedit is a Tk/Tcl program, so you need Tk/Tcl installed to run it.
 
-npiet-foogil needs libgd to compile and run.
+
+npiet-foogol needs libgd to compile and run.
+
+        # with a debian/ubuntu based host you can install libgd via
+        sudo apt-get install libgd2-xpm-dev
 
 
 a quick npiet-foogol and npiet test would be:

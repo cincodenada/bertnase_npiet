@@ -1107,6 +1107,7 @@ gen_expr (a_img *img, a_block *p_block, a_expr *expr, int *y_max)
     a_decl *d = find_decl (expr->var, p_block);
     if (! d) {
       fprintf (stderr, "internal error: var %s not found ?\n", expr->var);
+      return;
     }
     dprintf ("  push var %s (d_off %d, s_off %d)\n", 
 	     expr->var, d->off, s_off);
@@ -1116,13 +1117,13 @@ gen_expr (a_img *img, a_block *p_block, a_expr *expr, int *y_max)
      *
      * roll up, dup and roll down again (if on top, dup only)
      */
-    if (1 && s_off - d->off > 0) {
+    if (d && s_off - d->off > 0) {
       gen_img_push_smart (img, s_off - d->off);
       gen_img_push_smart (img, -1);
       gen_cmd (img, 4, 1);		/* roll */
     }
     gen_cmd (img, 4, 0);		/* dup */
-    if (1 && s_off - d->off > 0) {
+    if (d && s_off - d->off > 0) {
       gen_img_push_smart (img, s_off - d->off + 1);
       gen_img_push_smart (img, 1);
       gen_cmd (img, 4, 1);		/* roll */
@@ -1201,8 +1202,9 @@ gen_nodes (a_img *img, a_block *p_block, a_node *node, int *y_max)
 
     int s_off = s_depth;
     a_decl *d = find_decl (node->var, node->block);
-    if (!d ) {
+    if (! d) {
       fprintf (stderr, "internal error: var %s not found ?\n", node->var);
+      return;
     }
 
     gen_expr (img, p_block, node->arg1, &l_y_max);
