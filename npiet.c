@@ -54,7 +54,7 @@
  *
  */
 
-char *version = "v1.3b";
+char *version = "v1.3c";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1204,7 +1204,7 @@ read_png (char *fname)
 #include <gif_lib.h>
 
 #if defined GIFLIB_MAJOR && GIFLIB_MAJOR >= 5
-static void PrintGifErrorStr(char *str)
+static void PrintGifErrorStr(const char *str)
 {
   fprintf(stderr, "Error in GIF library: %s\n", str);
 }
@@ -1247,14 +1247,22 @@ read_gif (char *fname)
 #else
     PrintGifError ();
 #endif
+#if defined GIFLIB_MAJOR && (GIFLIB_MAJOR >= 6 || (GIFLIB_MAJOR == 5 && GIFLIB_MINOR >= 1))
+    DGifCloseFile (gif, &errcode);
+#else
     DGifCloseFile (gif);
+#endif
     return -1;
   }
 
   if (rtype != IMAGE_DESC_RECORD_TYPE 
       || DGifGetImageDesc (gif) == GIF_ERROR) {
     fprintf (stderr, "error: unknown gif format - exiting\n");
+#if defined GIFLIB_MAJOR && (GIFLIB_MAJOR >= 6 || (GIFLIB_MAJOR == 5 && GIFLIB_MINOR >= 1))
+    DGifCloseFile (gif, &errcode);
+#else
     DGifCloseFile (gif);
+#endif
     exit (-1);
   }
 
@@ -1320,7 +1328,11 @@ read_gif (char *fname)
     }
   }
 
+#if defined GIFLIB_MAJOR && (GIFLIB_MAJOR >= 6 || (GIFLIB_MAJOR == 5 && GIFLIB_MINOR >= 1))
+  DGifCloseFile (gif, &errcode);
+#else
   DGifCloseFile (gif);
+#endif
 
   return 0;
 }

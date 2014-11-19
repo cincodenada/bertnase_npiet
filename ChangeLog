@@ -1,3 +1,15 @@
+
+2014-11-19  <schoenfr@myth>
+
+	* version set to 1.3c
+
+	* npiet.c: added patch for giflib 5.1 support
+
+	  this time i received patches about this issue from two guys,
+	  just half an our apart - thank you very much !
+	  Baptiste Jonglez <baptiste@bitsofnetworks.org>
+	  Yusuke Endoh <mame@ruby-lang.org>
+
 2014-01-27  <schoenfr@myth>
 	
 	* version set to 1.3b
