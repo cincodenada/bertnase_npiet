@@ -55,6 +55,7 @@ INSTALL_DATA =		@INSTALL_DATA@
 ##
 SHELL = /bin/sh
 RM = rm
+MKDIR = mkdir
 
 ##
 ## And more:
@@ -116,9 +117,11 @@ check:
 ## installation:
 ##
 install:	$(PRG)
+	${MKDIR} -p $(DESTDIR)$(BINDIR)
 	$(INSTALL_PROGRAM) npiet $(DESTDIR)$(BINDIR)
 	$(INSTALL_PROGRAM) npietedit $(DESTDIR)$(BINDIR)
 	$(INSTALL_PROGRAM) npiet-foogol $(DESTDIR)$(BINDIR)
+	${MKDIR} -p $(DESTDIR)$(MANDIR)
 	$(INSTALL_DATA) npiet.1  $(DESTDIR)$(MANDIR)
 	$(INSTALL_DATA) npietedit.1 $(DESTDIR)$(MANDIR)
 	$(INSTALL_DATA) npiet-foogol.1 $(DESTDIR)$(MANDIR)

@@ -1,3 +1,13 @@
+2014-12-04  <schoenfr@myth>
+
+	* version set to 1.3d
+
+	* Makefile.in: added patch to create a non existing directory
+	  specified by prefix configure option, e.g.
+	    ./configure --prefix=/tmp/foo/bar
+
+	  bugreport and patch supplied by Yusuke Endoh
+	  <mame@ruby-lang.org> - thank you !
 
 2014-11-19  <schoenfr@myth>
 

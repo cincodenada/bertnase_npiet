@@ -54,7 +54,7 @@
  *
  */
 
-char *version = "v1.3c";
+char *version = "v1.3d";
 
 #include <stdio.h>
 #include <stdlib.h>
