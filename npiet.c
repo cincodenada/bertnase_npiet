@@ -301,12 +301,7 @@ static int width = 0, height = 0;
 #define adv_col(c, h, l)  (((((c) % 6) + (h)) % 6) \
                                 + (6 * ((((c) / 6) + (l)) % 3)))
 
-static struct c_color { 
-  int col;                      /* rgb color */
-  char *l_name;                 /* long color name */
-  char *s_name;                 /* short color name */
-  int c_idx;                    /* our internal color index */
-} c_colors [] = {
+static struct c_color c_colors [] = {
 
   { 0xFFC0C0, "light red", "lR", 0 },
   { 0xFFFFC0, "light yellow", "lY", 1 },
@@ -446,6 +441,20 @@ get_color_idx (int col)
     }
   }
   return -1;
+}
+
+struct c_color *
+get_idx_col (int idx)
+{
+  int i;
+
+  for (i = 0; i < n_colors; i++) {
+    if (idx == c_colors [i].c_idx) {
+      return &c_colors [i];
+    }
+  }
+
+  return &c_colors[c_white];
 }
 
 

@@ -42,10 +42,18 @@
 /* internal used index for filling areas: */
 #define c_mark_index    9999
 
+struct c_color {
+  int col;                      /* rgb color */
+  char *l_name;                 /* long color name */
+  char *s_name;                 /* short color name */
+  int c_idx;                    /* our internal color index */
+};
+
 int set_image( int w, int h );
 int read_ppm (char *fname);
 int read_png (char *fname);
 int get_color_idx (int col);
+struct c_color * get_idx_col (int idx);
 void set_cell (int x, int y, int val);
 void cleanup_input ();
 
