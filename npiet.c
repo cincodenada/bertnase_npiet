@@ -1991,7 +1991,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
 	for (i = 0; val > 0 && i < (val % 4); i++) {
 	  p_dir_pointer = turn_dp (p_dir_pointer);
 	}
-	for (i = 0; val < 0 && i > ((-1 * val) % 4); i++) {
+	for (i = 0; val < 0 && i > -((-1 * val) % 4); i--) {
 	  p_dir_pointer = turn_dp_inv (p_dir_pointer);
 	}
 	num_stack--;
