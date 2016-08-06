@@ -20,6 +20,9 @@
 #ifndef NPIET_H
 #define NPIET_H
 
+// Define this in order to run as library
+#define NPIET_RUN_AS_LIB
+
 #define BUF_LEN 300
 
 /*

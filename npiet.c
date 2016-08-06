@@ -65,6 +65,13 @@ char *version = "v1.3d";
 #include "npiet.h"
 #include "npiet_utils.h"
 
+#ifdef NPIET_RUN_AS_LIB
+/* run as a library, controlled by an external program */
+int run_as_lib = 1;
+#else
+int run_as_lib = 0;
+#endif
+
 // #ifdef HAVE_CONFIG_H
 # include "config.h"
 // #endif
@@ -169,9 +176,6 @@ char *do_n_str = 0;
  * without trace info: 
  */
 int version_11 = 0;
-
-/* run as a library, controlled by an external program */
-int run_as_lib = 1;
 
 /* helper: */
 #define dprintf         if (debug) printf
@@ -2764,51 +2768,53 @@ do_signal ()
 /*
  * main entry:
  */
-// int
-// main (int argc, char *argv[])
-// {
-//   int rc;
-// 
-//   if (parse_args (argc, argv) < 0) {
-//     usage (-1);
-//   }
-// 
-//   if (do_n_str) {
-//     do_n_str_cmd (do_n_str);
-//     exit (0);
-//   }
-// 
-//   if (! input_filename) {
-//     usage (-1);
-//   }
-// 
-//   if (read_png (input_filename) < 0
-//       && read_gif (input_filename) < 0
-//       && read_ppm (input_filename) < 0) {
-//     exit (-2);
-//   } else if (codel_size != 1) {
-//     cleanup_input ();
-//   }
-//   
-//   if (debug) {
-//     dump_cells ();
-//   }
-//   
-//   if (do_gdtrace) {
-//     gd_init ();
-// 
-//     /* save a pic on ctrl-c: */
-//     signal (SIGINT, do_signal);
-//   }
-// 
-//   rc = piet_run ();
-//   
-//   if (do_gdtrace) {
-//     gd_save ();
-//   }
-//   
-//   return rc;
-// }
+#ifndef NPIET_RUN_AS_LIB
+int
+main (int argc, char *argv[])
+{
+  int rc;
+
+  if (parse_args (argc, argv) < 0) {
+    usage (-1);
+  }
+
+  if (do_n_str) {
+    do_n_str_cmd (do_n_str);
+    exit (0);
+  }
+
+  if (! input_filename) {
+    usage (-1);
+  }
+
+  if (read_png (input_filename) < 0
+      && read_gif (input_filename) < 0
+      && read_ppm (input_filename) < 0) {
+    exit (-2);
+  } else if (codel_size != 1) {
+    cleanup_input ();
+  }
+  
+  if (debug) {
+    dump_cells ();
+  }
+  
+  if (do_gdtrace) {
+    gd_init ();
+
+    /* save a pic on ctrl-c: */
+    signal (SIGINT, do_signal);
+  }
+
+  rc = piet_run ();
+  
+  if (do_gdtrace) {
+    gd_save ();
+  }
+  
+  return rc;
+}
+#endif
 
 int set_image(int w, int h)
 {
