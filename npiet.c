@@ -1,30 +1,30 @@
 /*
- * npiet.c:						May 2004
- * (schoenfr@web.de)					Jan 2014
+ * npiet.c:                                             May 2004
+ * (schoenfr@web.de)                                    Jan 2014
  *
  * npiet is an interperter for the piet programming language.
  * 
  *
  * about the piet programming language see:
  *
- *	http://www.dangermouse.net/esoteric/piet.html
+ *      http://www.dangermouse.net/esoteric/piet.html
  *
  * more about the piet programming language and the npiet interpreter see:
  *
- *	http://www.bertnase.de/npiet/
+ *      http://www.bertnase.de/npiet/
  *
  *
  *   compile:
- *	  cc -o npiet npiet.c
+ *        cc -o npiet npiet.c
  *   use:
- *	  ./piet hi.ppm
+ *        ./piet hi.ppm
  *
  *
  * if compiled with gd-lib support, graphical trace output can be
  * created - great fun ;-)
  *
- *	  cc -DHAVE_GD_H -o npiet npiet.c -lgd
- *	  ./npiet -tpic hi.ppm 
+ *        cc -DHAVE_GD_H -o npiet npiet.c -lgd
+ *        ./npiet -tpic hi.ppm 
  *
  * reading png is supported if -DHAVE_PNP_H is set
  * and reading gif is supported if -DHAVE_GIF_LIB_H is set.
@@ -32,7 +32,7 @@
  *
  * but all this is automagically handled by running
  *
- *	  ./configure
+ *        ./configure
  * 
  *
  * Copyright (C) 2004 Erik Schoenfelder (schoenfr@web.de)
@@ -96,9 +96,9 @@ usage (int rc)
   fprintf (stderr, "\t-e <n>     - execution steps (default: unlimited)\n");
   fprintf (stderr, "\t-t         - trace (default: off)\n");
   fprintf (stderr, "\t-ub        - unknown colors are black "
-	   "(default: white)\n");
+           "(default: white)\n");
   fprintf (stderr, "\t-uu        - unknown colors give error "
-	   "(default: white)\n");
+           "(default: white)\n");
   fprintf (stderr, "\t-cs <n>    - codelsize of the input (default: guess)\n");
 #ifndef HAVE_GD_H
   fprintf (stderr, "\t-tpic      - create trace picture (not compiled in)\n");
@@ -145,7 +145,7 @@ int do_gdtrace = 0;
 char *gd_trace_filename = "npiet-trace.png";
 int gd_trace_simple = 0;
 unsigned gd_trace_start = 0;
-unsigned gd_trace_end = 1 << 31;		/* lot's to print */
+unsigned gd_trace_end = 1 << 31;                /* lot's to print */
 
 /* pixelsize when painting graphical trace output: */
 int c_xy = 32;
@@ -168,13 +168,13 @@ char *do_n_str = 0;
 int version_11 = 0;
 
 /* helper: */
-#define dprintf		if (debug) printf
-#define d2printf	if (debug > 1) printf
-#define tprintf		if (trace \
-			    && exec_step >= gd_trace_start \
+#define dprintf         if (debug) printf
+#define d2printf        if (debug > 1) printf
+#define tprintf         if (trace \
+                            && exec_step >= gd_trace_start \
                             && exec_step <= gd_trace_end) printf
-#define t2printf	if (trace > 1) printf
-#define vprintf		if (verbose) printf
+#define t2printf        if (trace > 1) printf
+#define vprintf         if (verbose) printf
 
 int 
 parse_args (int argc, char **argv)
@@ -208,21 +208,21 @@ parse_args (int argc, char **argv)
     } else if (! strcmp (argv [0], "-tpic")) {
 #ifndef HAVE_GD_H
       printf ("note: no GD support compiled in. the graphical trace "
-	      "feature is not avail\n");
+              "feature is not avail\n");
 #else
       do_gdtrace = 1;
       vprintf ("info: save trace output to %s\n", gd_trace_filename);
 #endif
     } else if (argc > 0 && ! strcmp (argv [0], "-tpf")) {
-      argc--, argv++;		/* shift */
+      argc--, argv++;           /* shift */
 #ifndef HAVE_GD_H
       printf ("note: no GD support compiled in. the graphical trace "
-	      "feature is not avail\n");
+              "feature is not avail\n");
 #else
       if ((c_xy = atoi (argv [0])) < 1) {
-	fprintf (stderr, "warning: trace pixelzoom %d is invalid\n",
-		 c_xy);
-	c_xy = 32;
+        fprintf (stderr, "warning: trace pixelzoom %d is invalid\n",
+                 c_xy);
+        c_xy = 32;
       } 
       vprintf ("info: trace pixelzoom set to %d\n", c_xy);
       do_gdtrace = 1;
@@ -230,20 +230,20 @@ parse_args (int argc, char **argv)
     } else if (! strcmp (argv [0], "-tps")) {
 #ifndef HAVE_GD_H
       printf ("note: no GD support compiled in. the graphical trace "
-	      "feature is not avail\n");
+              "feature is not avail\n");
 #else
       do_gdtrace = 1;
       gd_trace_simple++;
 #endif
     } else if (argc > 0 && ! strcmp (argv [0], "-e")) {
-      argc--, argv++;		/* shift */
+      argc--, argv++;           /* shift */
       max_exec_step = atoi (argv [0]);
       vprintf ("info: number of execution steps set to %u\n", max_exec_step);
     } else if (argc > 0 && ! strcmp (argv [0], "-ts")) {
-      argc--, argv++;		/* shift */
+      argc--, argv++;           /* shift */
 #ifndef HAVE_GD_H
       printf ("note: no GD support compiled in. the graphical trace "
-	      "feature is not avail\n");
+              "feature is not avail\n");
 #else
       gd_trace_start = atoi (argv [0]);
       vprintf ("info: graphical trace start set to %d\n", gd_trace_start);
@@ -251,10 +251,10 @@ parse_args (int argc, char **argv)
       do_gdtrace = 1; 
 #endif
     } else if (argc > 0 && ! strcmp (argv [0], "-te")) {
-      argc--, argv++;		/* shift */
+      argc--, argv++;           /* shift */
 #ifndef HAVE_GD_H
       printf ("note: no GD support compiled in. the graphical trace "
-	      "feature is not avail\n");
+              "feature is not avail\n");
 #else
       gd_trace_end = atoi (argv [0]);
       vprintf ("info: graphical trace end set to %d\n", gd_trace_end);
@@ -262,21 +262,21 @@ parse_args (int argc, char **argv)
       do_gdtrace = 1; 
 #endif
     } else if (argc > 0 && ! strcmp (argv [0], "-n-str")) {
-      argc--, argv++;		/* shift */
+      argc--, argv++;           /* shift */
       do_n_str = argv [0];
     } else if (argc > 0 && ! strcmp (argv [0], "-cs")) {
-      argc--, argv++;		/* shift */
+      argc--, argv++;           /* shift */
       if ((codel_size = atoi (argv [0])) < 1) {
-	fprintf (stderr, "warning: codelsize %d is invalid\n",
-		 codel_size);
-	codel_size = 1;
+        fprintf (stderr, "warning: codelsize %d is invalid\n",
+                 codel_size);
+        codel_size = 1;
       } 
       vprintf ("info: codelsize set to %d\n", codel_size);
     } else if (argv [0][0] == '-' && argv [0][1]) {
       usage (-1);
     } else if (! input_filename) {
       input_filename = argv [0];
-	vprintf ("info: using file %s\n", input_filename);
+        vprintf ("info: using file %s\n", input_filename);
     } else {
       usage (-1);
     }
@@ -307,22 +307,22 @@ static int width = 0, height = 0;
  *   idx 17:  black
 
  */
-#define n_hue		6		/* 4 colors */
-#define n_light		3		/* 4 shades */
-#define c_white		(n_hue * n_light)
-#define c_black		(c_white + 1)
-#define n_colors	(c_black + 1)
+#define n_hue           6               /* 4 colors */
+#define n_light         3               /* 4 shades */
+#define c_white         (n_hue * n_light)
+#define c_black         (c_white + 1)
+#define n_colors        (c_black + 1)
 /* internal used index for filling areas: */
-#define c_mark_index	9999
+#define c_mark_index    9999
 
 #define adv_col(c, h, l)  (((((c) % 6) + (h)) % 6) \
-				+ (6 * ((((c) / 6) + (l)) % 3)))
+                                + (6 * ((((c) / 6) + (l)) % 3)))
 
 static struct c_color { 
-  int col;			/* rgb color */
-  char *l_name;			/* long color name */
-  char *s_name;			/* short color name */
-  int c_idx;			/* our internal color index */
+  int col;                      /* rgb color */
+  char *l_name;                 /* long color name */
+  char *s_name;                 /* short color name */
+  int c_idx;                    /* our internal color index */
 } c_colors [] = {
 
   { 0xFFC0C0, "light red", "lR", 0 },
@@ -354,23 +354,23 @@ static struct c_color {
 /*
  * execution states:
  */
-int p_dir_pointer;		/* DP: p_{left, right, up, down} */
-int p_codel_chooser;		/* CC: p_left or p_right */
-int p_xpos, p_ypos;		/* execution position */
+int p_dir_pointer;              /* DP: p_{left, right, up, down} */
+int p_codel_chooser;            /* CC: p_left or p_right */
+int p_xpos, p_ypos;             /* execution position */
 
-#define p_left			'l'
-#define p_right			'r'
-#define p_up			'u'
-#define p_down			'd'
+#define p_left                  'l'
+#define p_right                 'r'
+#define p_up                    'u'
+#define p_down                  'd'
 
-#define toggle_cc(cc)	((cc) == 'r' ? 'l' : 'r')
+#define toggle_cc(cc)   ((cc) == 'r' ? 'l' : 'r')
 
-#define turn_dp(dp)	((dp) == 'r' ? 'd' : ((dp) == 'd' ? 'l' : \
-			 ((dp) == 'l' ? 'u' : 'r')))
-#define turn_dp_inv(dp)	((dp) == 'r' ? 'u' : ((dp) == 'u' ? 'l' : \
-			 ((dp) == 'l' ? 'd' : 'r')))
-#define dp_dx(dp)	((dp) == 'l' ? -1 : ((dp) == 'r' ? 1 : 0))
-#define dp_dy(dp)	((dp) == 'u' ? -1 : ((dp) == 'd' ? 1 : 0))
+#define turn_dp(dp)     ((dp) == 'r' ? 'd' : ((dp) == 'd' ? 'l' : \
+                         ((dp) == 'l' ? 'u' : 'r')))
+#define turn_dp_inv(dp) ((dp) == 'r' ? 'u' : ((dp) == 'u' ? 'l' : \
+                         ((dp) == 'l' ? 'd' : 'r')))
+#define dp_dx(dp)       ((dp) == 'l' ? -1 : ((dp) == 'r' ? 1 : 0))
+#define dp_dy(dp)       ((dp) == 'u' ? -1 : ((dp) == 'd' ? 1 : 0))
 
 /* informal step counter: */
 unsigned exec_step = 0;
@@ -378,9 +378,9 @@ unsigned exec_step = 0;
 /*
  * stack space for runtime action: 
  */
-long *stack = 0;		/* stack space */
-int num_stack = 0;		/* current number of values on stack */
-int max_stack = 0;		/* max size of stack allocated */
+long *stack = 0;                /* stack space */
+int num_stack = 0;              /* current number of values on stack */
+int max_stack = 0;              /* max size of stack allocated */
 
 void
 alloc_stack_space (int val)
@@ -398,7 +398,7 @@ alloc_stack_space (int val)
     stack = new_stack;
   }
   dprintf ("deb: stack extended to %d entries (num_stack is %d)\n",
-	   max_stack, num_stack);
+           max_stack, num_stack);
 }
 
 
@@ -505,9 +505,9 @@ cell_idx (int x, int y)
   return y * width + x;
 }
 #else
-# define cell_idx(x, y)		(((x) < 0 || (x) >= width \
-				  || (y) < 0 || (y) >= height) ? -1 : \
-				(y) * width + (x))
+# define cell_idx(x, y)         (((x) < 0 || (x) >= width \
+                                  || (y) < 0 || (y) >= height) ? -1 : \
+                                (y) * width + (x))
 #endif
 
 int
@@ -533,7 +533,7 @@ set_cell (int x, int y, int val)
   }
 
   if ((c_idx = cell_idx (x, y)) < 0) {
-    exit (-99);			/* internal error */
+    exit (-99);                 /* internal error */
   }
   cells [c_idx] = val;
 }
@@ -553,14 +553,14 @@ alloc_cells (int n_width, int n_height)
 
   if (! n_cells) {
     fprintf (stderr, "out of memory: cannot allocate %d * %d cells\n",
-	     n_height, n_width);
+             n_height, n_width);
     exit (-99);
   }
 
   if (cells) {
     for (j = 0; j < height; j++) {
       for (i = 0; i < width; i++) {
-	n_cells [j * n_width + i] = cells [j * width + i];
+        n_cells [j * n_width + i] = cells [j * width + i];
       }
     }
     free (cells);
@@ -622,7 +622,7 @@ int gd_white;
 int gd_black;
 int gd_nase;
 int gd_step;
-int gd_grey [8];		/* grey indices */
+int gd_grey [8];                /* grey indices */
 
 gdFontPtr gdft, gdfs;
 
@@ -651,9 +651,9 @@ gd_arrow_pp (int x1, int y1, int dp, int gd_col)
 
   for (i = 0; i < 3; i++) {
     gdImageLine (im, x1 - i * dp_dx(dp) + i * dp_dy(dp),
-		 y1 + i * dp_dx(dp) - i * dp_dy(dp),
-		 x1 - i * dp_dx(dp) - i * dp_dy(dp),
-		 y1 - i * dp_dx(dp) - i * dp_dy(dp), gd_col);
+                 y1 + i * dp_dx(dp) - i * dp_dy(dp),
+                 x1 - i * dp_dx(dp) - i * dp_dy(dp),
+                 y1 - i * dp_dx(dp) - i * dp_dy(dp), gd_col);
   }
 }
 
@@ -669,9 +669,9 @@ gd_arrow (int x1, int y1, int x2, int y2, int dp, int gd_col)
   
   for (i = 0; i < 3; i++) {
   gdImageLine (im, x2 - i * dp_dx(dp) + i * dp_dy(dp),
-	       y2 + i * dp_dx(dp) - i * dp_dy(dp),
-	       x2 - i * dp_dx(dp) - i * dp_dy(dp),
-	       y2 - i * dp_dx(dp) - i * dp_dy(dp), gd_col);
+               y2 + i * dp_dx(dp) - i * dp_dy(dp),
+               x2 - i * dp_dx(dp) - i * dp_dy(dp),
+               y2 - i * dp_dx(dp) - i * dp_dy(dp), gd_col);
   }
   /* gdImageLine (im, x1 - 2, y1 + 2, x2 + 2, y2 + 2, gd_col); */
 
@@ -706,9 +706,9 @@ gd_arrow (int x1, int y1, int x2, int y2, int dp, int gd_col)
 gdPoint r_pts [4] = { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 0 } };
 gdPoint l_pts [4] = { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 2 } };
 gdPoint d_pts [6] = { { 0, 2 }, { 0, 3 }, { 1, 0 }, { 1, 1 }, 
-		      { 1, 2 }, { 1, 3 } };
+                      { 1, 2 }, { 1, 3 } };
 gdPoint u_pts [7] = { { 0, 0 }, { 0, 1 }, { 0, 2 }, 
-		      { 1, 2 }, { 2, 0 }, { 2, 1 }, { 2, 2 } };
+                      { 1, 2 }, { 2, 0 }, { 2, 1 }, { 2, 2 } };
 
 gdPoint num_pts [10][15] = { 
   { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 }, { 0, 4 },
@@ -737,12 +737,12 @@ gdPoint num_pts [10][15] = {
 int num_pts_plen [10] = { 12, 5, 8, 8, 9, 8, 10, 6, 13, 11 };
 
 #define gd_ch_pts(c)  (c == 'r' ? r_pts : (c == 'l' ? l_pts : \
-		       (c == 'd' ? d_pts : (c == 'u' ? u_pts : \
-		        (c >= 0 && c <= 9 ? num_pts [c] : 0)))))
+                       (c == 'd' ? d_pts : (c == 'u' ? u_pts : \
+                        (c >= 0 && c <= 9 ? num_pts [c] : 0)))))
 #define gd_ch_plen(c) (c == 'r' ? 4 : (c == 'l' ? 4 : (c == 'd' ? 6 : \
-	       c == 'u' ? 7 : (c >= 0 && c <= 9 ? num_pts_plen[c] : 0))))
+               c == 'u' ? 7 : (c >= 0 && c <= 9 ? num_pts_plen[c] : 0))))
 #define gd_ch_pw(c)   (c == 0 || c == 4 || c == 6 || c > 7 ? 3 : \
-		       (c == 1 ? 1 : 2))
+                       (c == 1 ? 1 : 2))
 
 
 void
@@ -848,7 +848,7 @@ gd_init ()
   for (j = 0; j < height; j++) {
     for (i = 0; i < width; i++) {
       gdImageFilledRectangle (im, i * c_xy, j * c_xy, (i + 1) * c_xy - 1,
-			      (j + 1) * c_xy - 1, gd_col [get_cell (i, j)]);
+                              (j + 1) * c_xy - 1, gd_col [get_cell (i, j)]);
     }
   }
 
@@ -867,7 +867,7 @@ gd_save ()
   
   if (! (pngout = fopen (gd_trace_filename, "wb"))) {
     fprintf (stderr, "cannot open %s for writing; reason: %s\n",
-	     gd_trace_filename, strerror (errno));
+             gd_trace_filename, strerror (errno));
     do_gdtrace = 0;
     return;
   }
@@ -936,7 +936,7 @@ gd_try_step_pp (int try, int n_x, int n_y, int dp, int cc)
 
   gd_paint_ch (x3, y3, dp, gd_grey [gd_try_dcol]);
   gd_paint_ch (x3 + 3 + (dp == 'u' ? 1 : 0), y3 + 2, cc, 
-	       gd_grey [gd_try_dcol]);
+               gd_grey [gd_try_dcol]);
 
   gd_paint_num (x2, y2, try, gd_grey [gd_try_dcol]);
 
@@ -955,7 +955,7 @@ gd_try_step_pp (int try, int n_x, int n_y, int dp, int cc)
  */
 void
 gd_try_step (int exec_step, int tries, int n_x, int n_y,
-	    int dp, int cc)
+            int dp, int cc)
 {
   char tmp [128];
   int a_len = i_max((c_xy * 1) / 4, 6);
@@ -1017,19 +1017,19 @@ gd_try_step (int exec_step, int tries, int n_x, int n_y,
   } 
 
   gd_arrow (x1 + gd_try_xoff, y1 + gd_try_yoff, 
-	    x2 + gd_try_xoff, y2 + gd_try_yoff, dp, gd_grey [gd_try_dcol]);
+            x2 + gd_try_xoff, y2 + gd_try_yoff, dp, gd_grey [gd_try_dcol]);
 
   gdImageString (im, gdft, x3 + gd_try_xoff, y3 + gd_try_yoff, 
-		 (unsigned char *) tmp, 
-		 gd_grey [gd_try_dcol]);
+                 (unsigned char *) tmp, 
+                 gd_grey [gd_try_dcol]);
 
 #if 0
   gd_paint_dpcc (x1, y1, dp, cc, gd_grey [gd_try_dcol]);
 #else
   sprintf (tmp, "%c/%c", dp, cc);
   gdImageString (im, gdft, x3 + gd_try_xoff, y3 + gd_try_yoff + gdft->h - 1,
-		 (unsigned char *) tmp,
-		 gd_grey [gd_try_dcol]);
+                 (unsigned char *) tmp,
+                 gd_grey [gd_try_dcol]);
 #endif
 
   gd_try_dcol = (gd_try_dcol + 1) % 8;
@@ -1092,7 +1092,7 @@ gd_action (int p_x, int p_y, int n_x, int n_y, int a_x, int a_y, char *msg)
 /*
  * without support, make dummy substitution avail:
  */
-#define read_png(f)	(-1)
+#define read_png(f)     (-1)
 
 #else
 
@@ -1121,7 +1121,7 @@ read_png (char *fname)
   
   if (! (in = fopen (fname, "rb"))) { 
     fprintf (stderr, "cannot open `%s'; reason: %s\n", fname,
-	     strerror (errno));
+             strerror (errno));
     return -1;
   }
 
@@ -1139,9 +1139,9 @@ read_png (char *fname)
   png_set_sig_bytes (png_ptr, 8);
   
   png_read_png (png_ptr, info_ptr, 
-		PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_STRIP_ALPHA
-		| PNG_TRANSFORM_EXPAND, NULL);
-  /**		| PNG_TRANSFORM_PACKING | PNG_TRANSFORM_SHIFT **/
+                PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_STRIP_ALPHA
+                | PNG_TRANSFORM_EXPAND, NULL);
+  /**           | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_SHIFT **/
 
   row_pointers = png_get_rows (png_ptr, info_ptr);
 
@@ -1168,14 +1168,14 @@ read_png (char *fname)
       int col_idx = get_color_idx (col);
 
       if (col_idx < 0) {
-	if (unknown_color == -1) {
-	  fprintf (stderr, "cannot read from `%s'; reason: invalid color found\n",
-		   fname);
-	  return -1;
-	} else {
-	  /* set to black or white: */
-	  col_idx = (unknown_color == 0 ? c_black : c_white);
-	}
+        if (unknown_color == -1) {
+          fprintf (stderr, "cannot read from `%s'; reason: invalid color found\n",
+                   fname);
+          return -1;
+        } else {
+          /* set to black or white: */
+          col_idx = (unknown_color == 0 ? c_black : c_white);
+        }
       }
       
       set_cell (i, j, col_idx);
@@ -1197,7 +1197,7 @@ read_png (char *fname)
 /*
  * without support, make dummy substitution avail:
  */
-#define read_gif(f)	(-1)
+#define read_gif(f)     (-1)
 
 #else
 
@@ -1300,7 +1300,7 @@ read_gif (char *fname)
     }
 
     DGifGetLine (gif, line, width);
-	
+        
     for (i = 0; i < width; i++) {
       
       int col = line [i];
@@ -1311,19 +1311,19 @@ read_gif (char *fname)
       
       col = (r * 256 + g) * 256 + b;
       col_idx = get_color_idx (col);
-	
+        
       if (col_idx < 0) {
-	vprintf ("info: unknown color 0x%06x at %d,%d\n", col, i, j);
-	if (unknown_color == -1) {
-	  fprintf (stderr, "cannot read from `%s'; reason: invalid color found\n",
-		   fname);
-	  return -1;
-	} else {
-	  /* set to black or white: */
-	  col_idx = (unknown_color == 0 ? c_black : c_white);
-	}
+        vprintf ("info: unknown color 0x%06x at %d,%d\n", col, i, j);
+        if (unknown_color == -1) {
+          fprintf (stderr, "cannot read from `%s'; reason: invalid color found\n",
+                   fname);
+          return -1;
+        } else {
+          /* set to black or white: */
+          col_idx = (unknown_color == 0 ? c_black : c_white);
+        }
       }
-	  
+          
       set_cell (i, j, col_idx);
     }
   }
@@ -1360,13 +1360,13 @@ read_ppm (char *fname)
   }
   if (! in) { 
     fprintf (stderr, "cannot open `%s'; reason: %s\n", fname,
-	     strerror (errno));
+             strerror (errno));
     return -1;
   }
 
   if (! fgets (line, sizeof(line), in)) {
     fprintf (stderr, "cannot read from `%s'; reason: %s\n", fname,
-	     feof (in) ? "EOF" : strerror (errno));
+             feof (in) ? "EOF" : strerror (errno));
     return -1;
   }
 
@@ -1378,7 +1378,7 @@ read_ppm (char *fname)
     ppm_type = 3;
   } else {
     fprintf (stderr, "cannot read from `%s'; reason: unknown PPM format\n",
-	     fname);
+             fname);
     return -1;
   }
 
@@ -1388,23 +1388,23 @@ read_ppm (char *fname)
 
   if (feof (in) || 2 != sscanf (line, "%d %d\n", &width, &height)) {
     fprintf (stderr, "cannot read from `%s'; reason: unknown width height\n",
-	     fname);
+             fname);
     return -1;
   }
   
   if (1 != fscanf (in, "%d\n", &ncol)) {
     fprintf (stderr, "cannot read from `%s'; reason: unknown number of colors\n",
-	     fname);
+             fname);
     return -1;
   }
 
   if (ncol != 255) {
     fprintf (stderr, "warning: found number of colors %d, but 255 expected\n",
-	     ncol);
+             ncol);
   }
 
   vprintf ("info: got ppm image with %d x %d pixel and %d cols\n", 
-	   width, height, ncol);
+           width, height, ncol);
 
   alloc_cells (width, height);
 
@@ -1414,33 +1414,33 @@ read_ppm (char *fname)
       int r, g, b, col, col_idx;
 
       if (ppm_type == 6) {
-	if ((r = fgetc (in)) < 0 
-	    || (g = fgetc (in)) < 0 
-	    || (b = fgetc (in)) < 0) {
-	  fprintf (stderr, "cannot read from `%s'; reason: %s\n", fname,
-		   strerror (errno));
-	  return -1;
-	}
+        if ((r = fgetc (in)) < 0 
+            || (g = fgetc (in)) < 0 
+            || (b = fgetc (in)) < 0) {
+          fprintf (stderr, "cannot read from `%s'; reason: %s\n", fname,
+                   strerror (errno));
+          return -1;
+        }
       } else if (ppm_type == 3) {
-	if (3 != fscanf (in, "%d %d %d", &r, &g, &b)) {
-	  fprintf (stderr, "cannot read from `%s'; reason: %s\n", fname,
-		   strerror (errno));
-	  return -1;
-	}
+        if (3 != fscanf (in, "%d %d %d", &r, &g, &b)) {
+          fprintf (stderr, "cannot read from `%s'; reason: %s\n", fname,
+                   strerror (errno));
+          return -1;
+        }
       }
 
       col = ((r * (ncol + 1) + g) * (ncol + 1)) + b;
       col_idx = get_color_idx (col);
       if (col_idx < 0) {
-	vprintf ("info: unknown color 0x%06x at %d,%d\n", col, i, j);
-	if (unknown_color == -1) {
-	  fprintf (stderr, "cannot read from `%s'; reason: invalid color found\n",
-		   fname);
-	  return -1;
-	} else {
-	  /* set to black or white: */
-	  col_idx = (unknown_color == 0 ? c_black : c_white);
-	}
+        vprintf ("info: unknown color 0x%06x at %d,%d\n", col, i, j);
+        if (unknown_color == -1) {
+          fprintf (stderr, "cannot read from `%s'; reason: invalid color found\n",
+                   fname);
+          return -1;
+        } else {
+          /* set to black or white: */
+          col_idx = (unknown_color == 0 ? c_black : c_white);
+        }
       }
       
       set_cell (i, j, col_idx);
@@ -1491,7 +1491,7 @@ cleanup_input ()
     /* left to right: */
     for (j = 0; j < height; j++) {
       for (i = 0; i < width; i++) {
-	c_check (i, cells [j * width + i], &last_c, &last_p, &min_w);
+        c_check (i, cells [j * width + i], &last_c, &last_p, &min_w);
       }
       c_check (i, c_mark_index, &last_c, &last_p, &min_w);
     }
@@ -1499,7 +1499,7 @@ cleanup_input ()
     /* top to bottom: */
     for (i = 0; i < width; i++) {
       for (j = 0; j < height; j++) {
-	c_check (j, cells [j * width + i], &last_c, &last_p, &min_w);
+        c_check (j, cells [j * width + i], &last_c, &last_p, &min_w);
       }
       c_check (j, c_mark_index, &last_c, &last_p, &min_w);
     }
@@ -1510,12 +1510,12 @@ cleanup_input ()
 
   if (0 != (width % codel_size)) {
     fprintf (stderr, "error: codelsize %d does not match width of %d pixel\n",
-	     codel_size, width);
+             codel_size, width);
     exit (-5);
   } 
   if (0 != (height % codel_size)) {
     fprintf (stderr, "error: codelsize %d does not match height of %d pixel\n",
-	     codel_size, width);
+             codel_size, width);
     exit (-5);
   } 
 
@@ -1532,7 +1532,7 @@ cleanup_input ()
   for (j = 0; j < height; j++) {
     for (i = 0; i < width; i++) {
       set_cell (i, j, o_cells [(j * codel_size) * (width * codel_size)
-			       + (i * codel_size)]);
+                               + (i * codel_size)]);
     }
   }
 
@@ -1547,7 +1547,7 @@ cleanup_input ()
  */
 int 
 check_connected_cell (int x, int y, int c_idx, int c_mark, 
-		      int *n_x, int *n_y, int *num_cells)
+                      int *n_x, int *n_y, int *num_cells)
 {
   int c, found;
 
@@ -1559,38 +1559,38 @@ check_connected_cell (int x, int y, int c_idx, int c_mark,
   }
 
   dprintf ("deb: check_connected_cell %d,%d (col_idx %d)\n",
-	   x, y, c);
+           x, y, c);
   
   /*
    * look, if this codel is the furthest in dp and cc direction: 
    */
   found = 0;
 
-  if (p_dir_pointer == 'l' && x <= *n_x) {		/* left */
+  if (p_dir_pointer == 'l' && x <= *n_x) {              /* left */
     if (x < *n_x 
-	|| (p_codel_chooser == 'l' && y > *n_y)
-	|| (p_codel_chooser == 'r' && y < *n_y)) {
+        || (p_codel_chooser == 'l' && y > *n_y)
+        || (p_codel_chooser == 'r' && y < *n_y)) {
       found = 1;
     }
 
-  } else if (p_dir_pointer == 'r' && x >= *n_x) {	/* right */
+  } else if (p_dir_pointer == 'r' && x >= *n_x) {       /* right */
     if (x > *n_x 
-	|| (p_codel_chooser == 'l' && y < *n_y)
-	|| (p_codel_chooser == 'r' && y > *n_y)) {	  
+        || (p_codel_chooser == 'l' && y < *n_y)
+        || (p_codel_chooser == 'r' && y > *n_y)) {        
       found = 1;
     }
 
-  } else if (p_dir_pointer == 'u' && y <= *n_y) {	/* up */
+  } else if (p_dir_pointer == 'u' && y <= *n_y) {       /* up */
     if (y < *n_y 
-	|| (p_codel_chooser == 'l' && x < *n_x)
-	|| (p_codel_chooser == 'r' && x > *n_x)) {	  
+        || (p_codel_chooser == 'l' && x < *n_x)
+        || (p_codel_chooser == 'r' && x > *n_x)) {        
       found = 1;
     }
 
-  } else if (p_dir_pointer == 'd' && y >= *n_y) {	/* down */
+  } else if (p_dir_pointer == 'd' && y >= *n_y) {       /* down */
     if (y > *n_y 
-	|| (p_codel_chooser == 'l' && x > *n_x)
-	|| (p_codel_chooser == 'r' && x < *n_x)) {	  
+        || (p_codel_chooser == 'l' && x > *n_x)
+        || (p_codel_chooser == 'r' && x < *n_x)) {        
       found = 1;
     }
     
@@ -1598,7 +1598,7 @@ check_connected_cell (int x, int y, int c_idx, int c_mark,
 
   if (found) {
     dprintf ("deb: new best: dp=%c, cc=%c:  going from %d,%d -> %d,%d\n",
-	      p_dir_pointer, p_codel_chooser, *n_x, *n_y, x, y);
+              p_dir_pointer, p_codel_chooser, *n_x, *n_y, x, y);
     *n_x = x;
     *n_y = y;
   } 
@@ -1657,7 +1657,7 @@ piet_walk_border_do (int *n_x, int *n_y, int *num_cells)
 
   /* we fill the area with another color and check the border: */
   rc = check_connected_cell (p_xpos, p_ypos, c_idx, c_mark_index,
-			     n_x, n_y, num_cells);
+                             n_x, n_y, num_cells);
   
   dprintf ("DEB: after check: rc is %d (num_cells = %d)\n", rc, *num_cells);
 
@@ -1686,7 +1686,7 @@ piet_walk_border (int *n_x, int *n_y, int *num_cells)
   int rc;
 
   dprintf ("info: walk_border 1: n_x=%d, n_y=%d, n_dp=%c, n_cc=%c\n",
-	    *n_x, *n_y, p_dir_pointer, p_codel_chooser);
+            *n_x, *n_y, p_dir_pointer, p_codel_chooser);
 
   rc = piet_walk_border_do (n_x, n_y, num_cells);
 
@@ -1696,7 +1696,7 @@ piet_walk_border (int *n_x, int *n_y, int *num_cells)
   }
 
   dprintf ("info: walk_border 2: n_x=%d, n_y=%d, n_dp=%c, n_cc=%c\n",
-	    *n_x, *n_y, p_dir_pointer, p_codel_chooser);
+            *n_x, *n_y, p_dir_pointer, p_codel_chooser);
 
   return 0; 
 }
@@ -1707,7 +1707,7 @@ piet_walk_white (int *n_x, int *n_y)
   int c_col, a_x = *n_x, a_y = *n_y;
 
   dprintf ("info: walk_white 1: n_x=%d, n_y=%d, n_dp=%c, n_cc=%c\n",
-	   *n_x, *n_y, p_dir_pointer, p_codel_chooser);
+           *n_x, *n_y, p_dir_pointer, p_codel_chooser);
   
   c_col = get_cell (p_xpos, p_ypos);
 
@@ -1722,7 +1722,7 @@ piet_walk_white (int *n_x, int *n_y)
   *n_y = a_y;
 
   dprintf ("info: walk_border 2: n_x=%d, n_y=%d, n_dp=%c, n_cc=%c\n",
-	    *n_x, *n_y, p_dir_pointer, p_codel_chooser);
+            *n_x, *n_y, p_dir_pointer, p_codel_chooser);
 
   return 0; 
 }
@@ -1769,10 +1769,10 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
   strcpy (msg, "unknown");
 
   t2printf ("action: c_col=%s, a_col=%s -> hue_change %d - %d = %d, "
-	    "light_change %d - %d = %d\n", 
-	    cell2str (c_col), cell2str (a_col),
-	    get_hue (a_col), get_hue (c_col), hue_change,
-	    get_light (a_col), get_light (c_col), light_change);
+            "light_change %d - %d = %d\n", 
+            cell2str (c_col), cell2str (a_col),
+            get_hue (a_col), get_hue (c_col), hue_change,
+            get_light (a_col), get_light (c_col), light_change);
   
   switch (hue_change) {
 
@@ -1786,15 +1786,15 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       tprintf ("action: noop (oops ?)\n");
     } else if (light_change == 1) {
       /* 
-	 push: Pushes the value of the colour block just exited on to the
-	 stack. Note that values of colour blocks are not automatically
-	 pushed on to the stack - this push operation must be explicitly
-	 carried out.
+         push: Pushes the value of the colour block just exited on to the
+         stack. Note that values of colour blocks are not automatically
+         pushed on to the stack - this push operation must be explicitly
+         carried out.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "pu");
+        strcpy (msg, "pu");
       } else {
-	sprintf (msg, "push(%d)", num_cells);
+        sprintf (msg, "push(%d)", num_cells);
       }
       tprintf ("action: push, value %d\n", num_cells);
       alloc_stack_space (num_stack + 1);
@@ -1806,15 +1806,15 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
          pop: Pops the top value off the stack and discards it.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "po");
+        strcpy (msg, "po");
       } else {
-	strcpy (msg, "pop");
+        strcpy (msg, "pop");
       }
       tprintf ("action: pop\n");
       if (num_stack > 0) {
-	num_stack--;
+        num_stack--;
       } else {
-	tprintf ("info: pop failed: stack underflow\n");
+        tprintf ("info: pop failed: stack underflow\n");
       }
       tdump_stack ();
     }
@@ -1826,58 +1826,58 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
     if (light_change == 0) {
       /*
          add: Pops the top two values off the stack, adds them, and pushes
-	 the result back on the stack.
+         the result back on the stack.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "+");
+        strcpy (msg, "+");
       } else {
-	strcpy (msg, "add");
+        strcpy (msg, "add");
       }
       tprintf ("action: add\n");
       if (num_stack < 2) {
-	tprintf ("info: add failed: stack underflow \n");
+        tprintf ("info: add failed: stack underflow \n");
       } else {
-	stack [num_stack - 2] = stack [num_stack - 2] + stack [num_stack - 1];
-	num_stack--;
+        stack [num_stack - 2] = stack [num_stack - 2] + stack [num_stack - 1];
+        num_stack--;
       }
       tdump_stack ();
 
     } else if (light_change == 1) {
       /*
-	 subtract: Pops the top two values off the stack, subtracts the top
-	 value from the second top value, and pushes the result back on the
-	 stack.
+         subtract: Pops the top two values off the stack, subtracts the top
+         value from the second top value, and pushes the result back on the
+         stack.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "-");
+        strcpy (msg, "-");
       } else {
-	strcpy (msg, "sub");
+        strcpy (msg, "sub");
       }
       tprintf ("action: sub\n");
       if (num_stack < 2) {
-	tprintf ("info: sub failed: stack underflow \n");
+        tprintf ("info: sub failed: stack underflow \n");
       } else {
-	stack [num_stack - 2] = stack [num_stack - 2] - stack [num_stack - 1];
-	num_stack--;
+        stack [num_stack - 2] = stack [num_stack - 2] - stack [num_stack - 1];
+        num_stack--;
       }
       tdump_stack ();
 
     } else if (light_change == 2) {
       /*
          multiply: Pops the top two values off the stack, multiplies them,
-	 and pushes the result back on the stack.
+         and pushes the result back on the stack.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "*");
+        strcpy (msg, "*");
       } else {
-	strcpy (msg, "mul");
+        strcpy (msg, "mul");
       }
       tprintf ("action: multiply\n");
       if (num_stack < 2) {
-	tprintf ("info: multiply failed: stack underflow \n");
+        tprintf ("info: multiply failed: stack underflow \n");
       } else {
-	stack [num_stack - 2] = stack [num_stack - 2] * stack [num_stack - 1];
-	num_stack--;
+        stack [num_stack - 2] = stack [num_stack - 2] * stack [num_stack - 1];
+        num_stack--;
       }
       tdump_stack ();
     }
@@ -1888,63 +1888,63 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
     if (light_change == 0) {
       /*
          divide: Pops the top two values off the stack, calculates the
-	 integer division of the second top value by the top value, and
-	 pushes the result back on the stack.
+         integer division of the second top value by the top value, and
+         pushes the result back on the stack.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "/");
+        strcpy (msg, "/");
       } else {
-	strcpy (msg, "div");
+        strcpy (msg, "div");
       }
       tprintf ("action: divide\n");
       if (num_stack < 2) {
-	tprintf ("info: divide failed: stack underflow \n");
+        tprintf ("info: divide failed: stack underflow \n");
       } else if (stack [num_stack - 1] == 0) {
- 	/* try to put a undefined, but visible value on stack: */
-	stack [num_stack - 2] = 99999999;
-	num_stack--;
-	tprintf ("info: divide failed: division by zero\n");
+        /* try to put a undefined, but visible value on stack: */
+        stack [num_stack - 2] = 99999999;
+        num_stack--;
+        tprintf ("info: divide failed: division by zero\n");
       } else {
-	stack [num_stack - 2] = stack [num_stack - 2] / stack [num_stack - 1];
-	num_stack--;
+        stack [num_stack - 2] = stack [num_stack - 2] / stack [num_stack - 1];
+        num_stack--;
       }
       tdump_stack ();
 
     } else if (light_change == 1) {
       /*
          mod: Pops the top two values off the stack, calculates the second
-	 top value modulo the top value, and pushes the result back on the
-	 stack.
+         top value modulo the top value, and pushes the result back on the
+         stack.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "%");
+        strcpy (msg, "%");
       } else {
-	strcpy (msg, "mod");
+        strcpy (msg, "mod");
       }
       tprintf ("action: mod\n");
       if (num_stack < 2) {
-	tprintf ("info: mod failed: stack underflow \n");
+        tprintf ("info: mod failed: stack underflow \n");
       } else {
-	stack [num_stack - 2] = stack [num_stack - 2] % stack [num_stack - 1];
-	num_stack--;
+        stack [num_stack - 2] = stack [num_stack - 2] % stack [num_stack - 1];
+        num_stack--;
       }
       tdump_stack ();
 
     } else if (light_change == 2) {
       /*
          not: Replaces the top value of the stack with 0 if it is non-zero,
-	 and 1 if it is zero.
+         and 1 if it is zero.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "!");
+        strcpy (msg, "!");
       } else {
-	strcpy (msg, "not");
+        strcpy (msg, "not");
       }
       tprintf ("action: not\n");
       if (num_stack < 1) {
-	tprintf ("info: not failed: stack underflow \n");
+        tprintf ("info: not failed: stack underflow \n");
       } else {
-	stack [num_stack - 1] = ! stack [num_stack - 1];
+        stack [num_stack - 1] = ! stack [num_stack - 1];
       }
       tdump_stack ();
     }
@@ -1957,76 +1957,76 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
     if (light_change == 0) {
       /*
          greater: Pops the top two values off the stack, and pushes 1 on to
-	 the stack if the second top value is greater than the top value,
-	 and pushes 0 if it is not greater.
+         the stack if the second top value is greater than the top value,
+         and pushes 0 if it is not greater.
        */
       if (gd_trace_simple) {
-	strcpy (msg, ">");
+        strcpy (msg, ">");
       } else {
-	strcpy (msg, "gt");
+        strcpy (msg, "gt");
       }
       tprintf ("action: greater\n");
       if (num_stack < 2) {
-	tprintf ("info: greater failed: stack underflow \n");
+        tprintf ("info: greater failed: stack underflow \n");
       } else {
-	stack [num_stack - 2] = stack [num_stack - 2] > stack [num_stack - 1];
-	num_stack--;
+        stack [num_stack - 2] = stack [num_stack - 2] > stack [num_stack - 1];
+        num_stack--;
       }
       tdump_stack ();
 
     } else if (light_change == 1) {
       /*
          pointer: Pops the top value off the stack and rotates the DP
-	 clockwise that many steps (anticlockwise if negative).
+         clockwise that many steps (anticlockwise if negative).
        */
       int i, val;
 
       strcpy (msg, "dp");
       tprintf ("action: pointer\n");
       if (num_stack < 1) {
-	tprintf ("info: pointer failed: stack underflow \n");
+        tprintf ("info: pointer failed: stack underflow \n");
       } else {
-	val = stack [num_stack - 1];
+        val = stack [num_stack - 1];
 
-	for (i = 0; val > 0 && i < (val % 4); i++) {
-	  p_dir_pointer = turn_dp (p_dir_pointer);
-	}
-	for (i = 0; val < 0 && i > ((-1 * val) % 4); i++) {
-	  p_dir_pointer = turn_dp_inv (p_dir_pointer);
-	}
-	num_stack--;
+        for (i = 0; val > 0 && i < (val % 4); i++) {
+          p_dir_pointer = turn_dp (p_dir_pointer);
+        }
+        for (i = 0; val < 0 && i > ((-1 * val) % 4); i++) {
+          p_dir_pointer = turn_dp_inv (p_dir_pointer);
+        }
+        num_stack--;
 
-	if (! gd_trace_simple) {
-	  /* add param to msg: */
-	  sprintf (msg, "dp(%d)", val);
-	}
+        if (! gd_trace_simple) {
+          /* add param to msg: */
+          sprintf (msg, "dp(%d)", val);
+        }
       }
       tdump_stack ();
 
     } else if (light_change == 2) {
       /*
          switch: Pops the top value off the stack and toggles the CC that
-	 many times.
+         many times.
        */
       int i, val;
 
       strcpy (msg, "cc");
       tprintf ("action: switch\n");
       if (num_stack < 1) {
-	tprintf ("info: switch failed: stack underflow \n");
+        tprintf ("info: switch failed: stack underflow \n");
       } else {
-	val = stack [num_stack - 1];
+        val = stack [num_stack - 1];
 
-	for (i = 0; i < val; i++) {
-	  p_codel_chooser = toggle_cc (p_codel_chooser);
-	}
-	num_stack--;
-	tdump_stack ();
-	
-	if (! gd_trace_simple) {
-	  /* add param to msg: */
-	  sprintf (msg, "cc(%d)", val);
-	}
+        for (i = 0; i < val; i++) {
+          p_codel_chooser = toggle_cc (p_codel_chooser);
+        }
+        num_stack--;
+        tdump_stack ();
+        
+        if (! gd_trace_simple) {
+          /* add param to msg: */
+          sprintf (msg, "cc(%d)", val);
+        }
       }
       tdump_stack ();
     }
@@ -2038,101 +2038,101 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
     if (light_change == 0) {
       /*
          duplicate: Pushes a copy of the top value on the stack on to the
-	 stack.
+         stack.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "du");
+        strcpy (msg, "du");
       } else {
-	strcpy (msg, "dup");
+        strcpy (msg, "dup");
       }
       tprintf ("action: duplicate\n");
       if (num_stack < 1) {
-	tprintf ("info: duplicate failed: stack underflow \n");
+        tprintf ("info: duplicate failed: stack underflow \n");
       } else {
-	alloc_stack_space (num_stack + 1);
-	stack [num_stack] = stack [num_stack - 1];
-	num_stack++;
+        alloc_stack_space (num_stack + 1);
+        stack [num_stack] = stack [num_stack - 1];
+        num_stack++;
       }
       tdump_stack ();
 
     } else if (light_change == 1) {
       /*
          roll: Pops the top two values off the stack and "rolls" the
-	 remaining stack entries to a depth equal to the second value
-	 popped, by a number of rolls equal to the first value popped. A
-	 single roll to depth n is defined as burying the top value on the
-	 stack n deep and bringing all values above it up by 1 place. A
-	 negative number of rolls rolls in the opposite direction. A
-	 negative depth is an error and the command is ignored.
+         remaining stack entries to a depth equal to the second value
+         popped, by a number of rolls equal to the first value popped. A
+         single roll to depth n is defined as burying the top value on the
+         stack n deep and bringing all values above it up by 1 place. A
+         negative number of rolls rolls in the opposite direction. A
+         negative depth is an error and the command is ignored.
        */
       int roll, depth;
 
       if (gd_trace_simple) {
-	strcpy (msg, "ro");
+        strcpy (msg, "ro");
       } else {
-	strcpy (msg, "roll");
+        strcpy (msg, "roll");
       }
       tprintf ("action: roll\n");
       if (num_stack < 2) {
-	tprintf ("info: roll failed: stack underflow \n");
+        tprintf ("info: roll failed: stack underflow \n");
       } else {
-	roll = stack [num_stack - 1];
-	depth = stack [num_stack - 2];
-	num_stack -= 2;
+        roll = stack [num_stack - 1];
+        depth = stack [num_stack - 2];
+        num_stack -= 2;
 
-	if (depth < 0) {
-	  tprintf ("info: roll failed: negative depth \n");
-	} else if (num_stack < depth) {
-	  tprintf ("info: roll failed: stack underflow \n");
-	} else {
-	  int i;
-	  /* roll is positive: */
-	  for (i = 0; i < roll && roll > 0; i++) {
-	    int j, val = stack [num_stack - 1];
-	    for (j = 0; j < depth - 1; j++) {
-	      stack [num_stack - j - 1] = stack [num_stack - j - 2];
-	    }
-	    stack [num_stack - depth] = val;
-	  }
-	  /* roll is negative: */
-	  for (i = 0; i > roll && roll < 0; i--) {
-	    int j, val = stack [num_stack - depth];
-	    for (j = 0; j < depth - 1; j++) {
-	      stack [num_stack - depth + j ] = 
-		stack [num_stack - depth + j + 1];
-	    }
-	    stack [num_stack - 1] = val;
-	  }
-	}
+        if (depth < 0) {
+          tprintf ("info: roll failed: negative depth \n");
+        } else if (num_stack < depth) {
+          tprintf ("info: roll failed: stack underflow \n");
+        } else {
+          int i;
+          /* roll is positive: */
+          for (i = 0; i < roll && roll > 0; i++) {
+            int j, val = stack [num_stack - 1];
+            for (j = 0; j < depth - 1; j++) {
+              stack [num_stack - j - 1] = stack [num_stack - j - 2];
+            }
+            stack [num_stack - depth] = val;
+          }
+          /* roll is negative: */
+          for (i = 0; i > roll && roll < 0; i--) {
+            int j, val = stack [num_stack - depth];
+            for (j = 0; j < depth - 1; j++) {
+              stack [num_stack - depth + j ] = 
+                stack [num_stack - depth + j + 1];
+            }
+            stack [num_stack - 1] = val;
+          }
+        }
       }
       tdump_stack ();
 
     } else if (light_change == 2) {
       /*
          in: Reads a value from STDIN as either a number or character,
-	 depending on the particular incarnation of this command and pushes
-	 it on to the stack.
+         depending on the particular incarnation of this command and pushes
+         it on to the stack.
        */
       int c;
 
       if (gd_trace_simple) {
-	strcpy (msg, "iN");
+        strcpy (msg, "iN");
       } else {
-	strcpy (msg, "inN");
+        strcpy (msg, "inN");
       }
       tprintf ("action: in(number)\n");
       alloc_stack_space (num_stack + 1);
 
       if (! quiet) {
-	/* show a prompt: */
-	printf ("? "); fflush (stdout);
+        /* show a prompt: */
+        printf ("? "); fflush (stdout);
       }
 
       if (1 != fscanf (stdin, "%d", &c)) {
-	tprintf ("info: cannot read int from stdin; reason: %s\n",
-		 strerror (errno));
+        tprintf ("info: cannot read int from stdin; reason: %s\n",
+                 strerror (errno));
       } else {
-	stack [num_stack++] = c;
+        stack [num_stack++] = c;
       }
       tdump_stack ();
     }
@@ -2145,77 +2145,77 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
     if (light_change == 0) {
       /*
          in: Reads a value from STDIN as either a number or character,
-	 depending on the particular incarnation of this command and pushes
-	 it on to the stack.
+         depending on the particular incarnation of this command and pushes
+         it on to the stack.
        */
       int c;
 
       if (gd_trace_simple) {
-	strcpy (msg, "iC");
+        strcpy (msg, "iC");
       } else {
-	strcpy (msg, "inC");
+        strcpy (msg, "inC");
       }
       tprintf ("action: in(char)\n");
       alloc_stack_space (num_stack + 1);
 
       if (! quiet) {
-	/* show a prompt: */
-	printf ("? "); fflush (stdout);
+        /* show a prompt: */
+        printf ("? "); fflush (stdout);
       }
       if ((c = getchar ()) < 0) {
-	tprintf ("info: cannot read char from stdin; reason: %s\n",
-		 strerror (errno));
+        tprintf ("info: cannot read char from stdin; reason: %s\n",
+                 strerror (errno));
       } else {
-	stack [num_stack++] = c % 0xff;
+        stack [num_stack++] = c % 0xff;
       }
       tdump_stack ();
 
     } else if (light_change == 1) {
       /*
          out: Pops the top value off the stack and prints it to STDOUT as
-	 either a number or character, depending on the particular
-	 incarnation of this command.
+         either a number or character, depending on the particular
+         incarnation of this command.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "oN");
+        strcpy (msg, "oN");
       } else {
-	strcpy (msg, "outN");
+        strcpy (msg, "outN");
       }
       tprintf ("action: out(number)\n");
       if (num_stack < 1) {
-	tprintf ("info: out(number) failed: stack underflow \n");
+        tprintf ("info: out(number) failed: stack underflow \n");
       } else {
-	printf ("%ld", stack [num_stack - 1]); fflush (stdout);
-	if (trace || debug) {
-	  /* increase readability: */
-	  tprintf ("\n");
-	}
-	num_stack--;
+        printf ("%ld", stack [num_stack - 1]); fflush (stdout);
+        if (trace || debug) {
+          /* increase readability: */
+          tprintf ("\n");
+        }
+        num_stack--;
       }
       tdump_stack ();
 
     } else if (light_change == 2) {
       /*
          out: Pops the top value off the stack and prints it to STDOUT as
-	 either a number or character, depending on the particular
-	 incarnation of this command.
+         either a number or character, depending on the particular
+         incarnation of this command.
        */
       if (gd_trace_simple) {
-	strcpy (msg, "oC");
+        strcpy (msg, "oC");
       } else {
-	strcpy (msg, "outC");
+        strcpy (msg, "outC");
       }
       tprintf ("action: out(char)\n");
       if (num_stack < 1) {
-	tprintf ("info: out(char) failed: stack underflow \n");
+        tprintf ("info: out(char) failed: stack underflow \n");
       } else {
-	printf ("%c", (int) (stack [num_stack - 1] & 0xff));
-	fflush (stdout);
-	if (trace || debug) {
-	  /* increase readability: */
-	  tprintf ("\n");
-	}
-	num_stack--;
+        printf ("%c", (int) (stack [num_stack - 1] & 0xff));
+        fflush (stdout);
+        if (trace || debug) {
+          /* increase readability: */
+          tprintf ("\n");
+        }
+        num_stack--;
       }
       tdump_stack ();
     }
@@ -2244,7 +2244,7 @@ piet_step ()
 
   if (max_exec_step > 0 && exec_step >= max_exec_step) {
     fprintf (stderr, "error: configured execution steps exceeded (%d steps)\n",
-	     exec_step);
+             exec_step);
     return -1;
   }
 
@@ -2301,8 +2301,8 @@ piet_step ()
 
       /* head on: */
       if (tries == 0) {
-	tprintf ("trace: special case: we at a white codel"
-		 " - continuing\n");
+        tprintf ("trace: special case: we at a white codel"
+                 " - continuing\n");
       }
       num_cells = 1;
     } else {
@@ -2316,13 +2316,13 @@ piet_step ()
     a_col = get_cell (a_x, a_y);
 
     dprintf ("deb: try %d: testing cell %d, %d (col_idx %d) "
-	     "with dp='%c', cc='%c'\n",
-	     tries, a_x, a_y, a_col, p_dir_pointer, p_codel_chooser);
+             "with dp='%c', cc='%c'\n",
+             tries, a_x, a_y, a_col, p_dir_pointer, p_codel_chooser);
 
     if (do_gdtrace && ! gd_trace_simple && gd_trace_end > 0
-	&& exec_step >= gd_trace_start && exec_step <= gd_trace_end) {
+        && exec_step >= gd_trace_start && exec_step <= gd_trace_end) {
       gd_try_step (exec_step, tries, n_x, n_y, 
-		   p_dir_pointer, p_codel_chooser);
+                   p_dir_pointer, p_codel_chooser);
     }
 
     /*
@@ -2346,72 +2346,72 @@ piet_step ()
      */
     if (a_col == c_white) {
       while (a_col == c_white) {
-	dprintf ("deb: white cell passed to %d, %d (now col_idx %d)\n",
-		 a_x, a_y, a_col);
-	a_x += dp_dx (p_dir_pointer);
-	a_y += dp_dy (p_dir_pointer);
-	a_col = get_cell (a_x, a_y);
+        dprintf ("deb: white cell passed to %d, %d (now col_idx %d)\n",
+                 a_x, a_y, a_col);
+        a_x += dp_dx (p_dir_pointer);
+        a_y += dp_dy (p_dir_pointer);
+        a_col = get_cell (a_x, a_y);
       }
       
       if (a_col >= 0 && a_col != c_black) {
-	/* a valid cell - continue without action: */
-	tprintf ("trace: white cell(s) crossed - continuing with no command "
-		 "at %d,%d...\n", a_x, a_y);
-	white_crossed = 1;
+        /* a valid cell - continue without action: */
+        tprintf ("trace: white cell(s) crossed - continuing with no command "
+                 "at %d,%d...\n", a_x, a_y);
+        white_crossed = 1;
       } else {
         /*
          * When sliding into a black block or over the edge of the world,
          * the Perl Piet interpreter sets the white block as the current
          * block. The Tower of Hanoi example relies on this behaviour.
          */
-	if (version_11) {
-	  /*
-	   * patch from Yusuke ENDOH <mame@tsg.ne.jp>
-	   *
-   	   * ``According to `Clarification of white block behaviour
-	   *   (added 25 January, 2008)' in the Piet specification [1],
-	   *   when sliding into a black block, the interpreter must
-	   *   not stay in the coloured block but move to the white
-	   *   block. But the current behaviour of npiet is `stay'.''
-	   */
-	  int *visited = NULL, visited_len = 0, i;
-	  white_crossed = 1;
-	  while (a_col < 0 || a_col == c_black) {
-	    a_col = c_white;
-	    a_x -= dp_dx (p_dir_pointer);
-	    a_y -= dp_dy (p_dir_pointer);
-	    tprintf("trace: hitting black block when sliding at %d,%d %c %c\n",
-		    a_x, a_y, p_codel_chooser, p_dir_pointer);
+        if (version_11) {
+          /*
+           * patch from Yusuke ENDOH <mame@tsg.ne.jp>
+           *
+           * ``According to `Clarification of white block behaviour
+           *   (added 25 January, 2008)' in the Piet specification [1],
+           *   when sliding into a black block, the interpreter must
+           *   not stay in the coloured block but move to the white
+           *   block. But the current behaviour of npiet is `stay'.''
+           */
+          int *visited = NULL, visited_len = 0, i;
+          white_crossed = 1;
+          while (a_col < 0 || a_col == c_black) {
+            a_col = c_white;
+            a_x -= dp_dx (p_dir_pointer);
+            a_y -= dp_dy (p_dir_pointer);
+            tprintf("trace: hitting black block when sliding at %d,%d %c %c\n",
+                    a_x, a_y, p_codel_chooser, p_dir_pointer);
 
-	    p_codel_chooser = toggle_cc(p_codel_chooser);
-	    p_dir_pointer = turn_dp(p_dir_pointer);
+            p_codel_chooser = toggle_cc(p_codel_chooser);
+            p_dir_pointer = turn_dp(p_dir_pointer);
 
-	    for (i = 0; i < visited_len; i++) {
-	      if (visited[i * 4 + 0] == a_x &&
-		  visited[i * 4 + 1] == a_y &&
-		  visited[i * 4 + 2] == p_codel_chooser &&
-		  visited[i * 4 + 3] == p_dir_pointer) {
-		return -1;
-	      }
-	    }
+            for (i = 0; i < visited_len; i++) {
+              if (visited[i * 4 + 0] == a_x &&
+                  visited[i * 4 + 1] == a_y &&
+                  visited[i * 4 + 2] == p_codel_chooser &&
+                  visited[i * 4 + 3] == p_dir_pointer) {
+                return -1;
+              }
+            }
 
-	    visited = realloc(visited, 4 * (visited_len + 1) * sizeof(int));
-	    visited[i * 4 + 0] = a_x;
-	    visited[i * 4 + 1] = a_y;
-	    visited[i * 4 + 2] = p_codel_chooser;
-	    visited[i * 4 + 3] = p_dir_pointer;
-	    visited_len++;
+            visited = realloc(visited, 4 * (visited_len + 1) * sizeof(int));
+            visited[i * 4 + 0] = a_x;
+            visited[i * 4 + 1] = a_y;
+            visited[i * 4 + 2] = p_codel_chooser;
+            visited[i * 4 + 3] = p_dir_pointer;
+            visited_len++;
 
-	    while (a_col == c_white) {
-	      dprintf ("deb: white cell passed to %d, %d (now col_idx %d)\n",
-		       a_x, a_y, a_col);
-	      a_x += dp_dx (p_dir_pointer);
-	      a_y += dp_dy (p_dir_pointer);
-	      a_col = get_cell (a_x, a_y);
-	    }
-	  }
-	  if (visited) free(visited);
-	} else {
+            while (a_col == c_white) {
+              dprintf ("deb: white cell passed to %d, %d (now col_idx %d)\n",
+                       a_x, a_y, a_col);
+              a_x += dp_dx (p_dir_pointer);
+              a_y += dp_dy (p_dir_pointer);
+              a_col = get_cell (a_x, a_y);
+            }
+          }
+          if (visited) free(visited);
+        } else {
           white_crossed = 1;
           a_col = c_white;
           a_x -= dp_dx (p_dir_pointer);
@@ -2427,57 +2427,57 @@ piet_step ()
        * we hit something black or a wall:
        */
       if (c_col == c_white || in_white) {
-	// toggle dp and cc:
-	p_codel_chooser = toggle_cc(p_codel_chooser);
-	p_dir_pointer = turn_dp(p_dir_pointer);
-	dprintf ("deb: in white codel - toggle both dp and cc\n");
-	dprintf ("deb: toggle cc to '%c'\n", p_codel_chooser);
-	dprintf ("deb: toggle dp to '%c'\n", p_dir_pointer);
+        // toggle dp and cc:
+        p_codel_chooser = toggle_cc(p_codel_chooser);
+        p_dir_pointer = turn_dp(p_dir_pointer);
+        dprintf ("deb: in white codel - toggle both dp and cc\n");
+        dprintf ("deb: toggle cc to '%c'\n", p_codel_chooser);
+        dprintf ("deb: toggle dp to '%c'\n", p_dir_pointer);
       } else {
-	if ((p_toggle % 2) == 0) {
-	  p_codel_chooser = toggle_cc(p_codel_chooser);
-	  dprintf ("deb: toggle cc to '%c'\n", p_codel_chooser);
-	} else {
-	  p_dir_pointer = turn_dp(p_dir_pointer);
-	  dprintf ("deb: toggle dp to '%c'\n", p_dir_pointer);
-	}
+        if ((p_toggle % 2) == 0) {
+          p_codel_chooser = toggle_cc(p_codel_chooser);
+          dprintf ("deb: toggle cc to '%c'\n", p_codel_chooser);
+        } else {
+          p_dir_pointer = turn_dp(p_dir_pointer);
+          dprintf ("deb: toggle dp to '%c'\n", p_dir_pointer);
+        }
       }
       p_toggle++;
 
     } else {
       tprintf ("\ntrace: step %d  (%d,%d/%c,%c %s -> %d,%d/%c,%c %s):\n",
-	       exec_step, p_xpos, p_ypos, pre_dp, pre_cc,
-	       cell2str (get_cell (p_xpos, p_ypos)),
-	       a_x, a_y, p_dir_pointer, p_codel_chooser,
-	       cell2str (get_cell (a_x, a_y)));
+               exec_step, p_xpos, p_ypos, pre_dp, pre_cc,
+               cell2str (get_cell (p_xpos, p_ypos)),
+               a_x, a_y, p_dir_pointer, p_codel_chooser,
+               cell2str (get_cell (a_x, a_y)));
       
       exec_step++;
 
       if (white_crossed) {
-	/* no command is executed - anything is fine: */
+        /* no command is executed - anything is fine: */
 
-	if (gd_trace_simple) {
-	  strcpy (msg, "no");
-	} else {
-	  strcpy (msg, "noop");
-	}
-	t2printf ("action: none\n");
+        if (gd_trace_simple) {
+          strcpy (msg, "no");
+        } else {
+          strcpy (msg, "noop");
+        }
+        t2printf ("action: none\n");
 
-	rc = 0;
+        rc = 0;
       } else {
-	/* make a program step: */
-	rc = piet_action (c_col, a_col, num_cells, msg);
+        /* make a program step: */
+        rc = piet_action (c_col, a_col, num_cells, msg);
       } 
       
       if (do_gdtrace && gd_trace_end > 0
-	  && exec_step >= gd_trace_start && exec_step <= gd_trace_end) {
-	/* graphical trace output: */	
-	gd_action (pre_xpos, pre_ypos, n_x, n_y, a_x, a_y, msg);
+          && exec_step >= gd_trace_start && exec_step <= gd_trace_end) {
+        /* graphical trace output: */   
+        gd_action (pre_xpos, pre_ypos, n_x, n_y, a_x, a_y, msg);
       }
 
       if (rc < 0) {
-	/* we had an error: */
-	return -1;
+        /* we had an error: */
+        return -1;
       }
 
       t2printf ("step done: continuing at %d,%d...\n", a_x, a_y);
@@ -2507,7 +2507,7 @@ piet_run ()
   while (1) {
 
     t2printf ("trace:  pos=%d,%d dp=%c cc=%c\n",
-	      p_xpos, p_ypos, p_dir_pointer, p_codel_chooser);
+              p_xpos, p_ypos, p_dir_pointer, p_codel_chooser);
 
     if (piet_step () < 0) {
       vprintf ("\ninfo: program end\n");
@@ -2608,9 +2608,9 @@ do_n_str_cmd (char *do_n_str)
 
   gdImageFilledRectangle (img, 0, 0, 0, (avg / 5 - 1), cols [6]);   /* red */
   gdImageFilledRectangle (img, 1, 0, 1, 3, cols [12]);
-  gdImageFilledRectangle (img, 2, 0, 2, 0, cols [12]);	/* push */
-  gdImageSetPixel (img, 3, 0, cols [0]);		/* push */
-  gdImageSetPixel (img, 4, 0, cols [13]);		/* mul */
+  gdImageFilledRectangle (img, 2, 0, 2, 0, cols [12]);  /* push */
+  gdImageSetPixel (img, 3, 0, cols [0]);                /* push */
+  gdImageSetPixel (img, 4, 0, cols [13]);               /* mul */
 
   col = 13;
   x = 5;
@@ -2635,7 +2635,7 @@ do_n_str_cmd (char *do_n_str)
       y += i_max (avg / 5 + 2, d_max / 4 + 2);
       gdImageSetPixel (img, x + 1, y - 2, cols [6]);
       gdImageSetPixel (img, x + 1, y - 1, cols [12]);           /* push */
-      gdImageSetPixel (img, x + 1, y, cols [3]);		/* dp */
+      gdImageSetPixel (img, x + 1, y, cols [3]);                /* dp */
 
       x = 0;
 
@@ -2643,14 +2643,14 @@ do_n_str_cmd (char *do_n_str)
       gdImageSetPixel (img, x + 5, y, cols [9]);
       gdImageSetPixel (img, x + 4, y, cols [15]);
 
-      gdImageSetPixel (img, x + 2, y, cols [6]);		/* cc */
+      gdImageSetPixel (img, x + 2, y, cols [6]);                /* cc */
       gdImageSetPixel (img, x + 3, y, cols [6]);
       gdImageSetPixel (img, x + 1, y, cols [12]);               /* push */
-      gdImageSetPixel (img, x, y, cols [3]);		        /* dp */
-      gdImageSetPixel (img, x, y + 1, cols [3]);		/* dp */
-      gdImageSetPixel (img, x + 1, y + 1, cols [3]);		/* dp */
+      gdImageSetPixel (img, x, y, cols [3]);                    /* dp */
+      gdImageSetPixel (img, x, y + 1, cols [3]);                /* dp */
+      gdImageSetPixel (img, x + 1, y + 1, cols [3]);            /* dp */
 
-      gdImageSetPixel (img, x + 2, y + 1, cols [1]);		/* dup */
+      gdImageSetPixel (img, x + 2, y + 1, cols [1]);            /* dup */
 
       x += 4;
       y += 1;
@@ -2661,7 +2661,7 @@ do_n_str_cmd (char *do_n_str)
 
     /* dup: */
     col = adv_col(col, 4, 0);
-    gdImageSetPixel (img, x, y, cols [col]);			/* dup */
+    gdImageSetPixel (img, x, y, cols [col]);                    /* dup */
 
     o = i_abs (d) - 1;
 #if 1
@@ -2669,15 +2669,15 @@ do_n_str_cmd (char *do_n_str)
 
     for (j = 0; o > 0; j++) {
       for (k = 0; k < 4 && o > 0; k++) {
-	gdImageSetPixel (img, x - k, y + j + 1, cols [col]);
-	o--;
+        gdImageSetPixel (img, x - k, y + j + 1, cols [col]);
+        o--;
       }
     }
 #endif
     x += 1;
 
     col = adv_col(col, 0, 1);
-    gdImageSetPixel (img, x, y, cols [col]);	/* push */
+    gdImageSetPixel (img, x, y, cols [col]);    /* push */
 
     printf ("push: x=%d, y=%d, col=%d\n", x, y, col);
 
@@ -2685,14 +2685,14 @@ do_n_str_cmd (char *do_n_str)
 
     if (d < 0) {
       col = adv_col(col, 1, 1);
-      gdImageSetPixel (img, x, y, cols [col]);	/* sub */
+      gdImageSetPixel (img, x, y, cols [col]);  /* sub */
     } else if (d > 0) {
       col = adv_col(col, 1, 0);
-      gdImageSetPixel (img, x, y, cols [col]);	/* add */
+      gdImageSetPixel (img, x, y, cols [col]);  /* add */
     } else {
       printf ("dup only\n");
       col = adv_col(col, 0, 2);
-      gdImageSetPixel (img, x, y, cols [col]);	/* pop */
+      gdImageSetPixel (img, x, y, cols [col]);  /* pop */
     }
 
     printf ("sub/add/pop: x=%d, y=%d, col=%d\n", x, y, col);
@@ -2700,7 +2700,7 @@ do_n_str_cmd (char *do_n_str)
     x += 1;
 
     col = adv_col(col, 5, 2);
-    gdImageSetPixel (img, x, y, cols [col]);	/* outchar */
+    gdImageSetPixel (img, x, y, cols [col]);    /* outchar */
 
     printf ("out(c): x=%d, y=%d, col=%d\n", x, y, col);
 
@@ -2715,7 +2715,7 @@ do_n_str_cmd (char *do_n_str)
   
   if (! (out = fopen ("n-str.png", "wb"))) {
     fprintf (stderr, "cannot open n-str.png for writing; reason: %s\n",
-	     strerror (errno));
+             strerror (errno));
   } else {
     gdImagePng (img, out);
     fclose (out);
