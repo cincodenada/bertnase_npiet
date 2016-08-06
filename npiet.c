@@ -1551,7 +1551,7 @@ check_connected_cell (int x, int y, int c_idx, int c_mark,
   }
 
   dprintf ("deb: check_connected_cell %d,%d (c %d col_idx %d)\n",
-	   x, y, c, c_idx);
+           x, y, c, c_idx);
   
   /*
    * look, if this codel is the furthest in dp and cc direction: 
@@ -1823,7 +1823,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       if (num_stack > 0) {
         num_stack--;
       } else {
-		  strncpy(notify_msg, "pop failed: stack underflow\n", BUF_LEN);
+        strncpy(notify_msg, "pop failed: stack underflow\n", BUF_LEN);
         tprintf ("info: pop failed: stack underflow\n");
       }
       tdump_stack ();
@@ -1886,7 +1886,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       }
       tprintf ("action: multiply\n");
       if (num_stack < 2) {
-          strncpy(notify_msg, "multiply failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "multiply failed: stack underflow \n", BUF_LEN);
         tprintf ("info: multiply failed: stack underflow \n");
       } else {
         stack [num_stack - 2] = stack [num_stack - 2] * stack [num_stack - 1];
@@ -1911,7 +1911,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       }
       tprintf ("action: divide\n");
       if (num_stack < 2) {
-          strncpy(notify_msg, "divide failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "divide failed: stack underflow \n", BUF_LEN);
         tprintf ("info: divide failed: stack underflow \n");
       } else if (stack [num_stack - 1] == 0) {
         /* try to put a undefined, but visible value on stack: */
@@ -1938,7 +1938,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       }
       tprintf ("action: mod\n");
       if (num_stack < 2) {
-          strncpy(notify_msg, "mod failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "mod failed: stack underflow \n", BUF_LEN);
         tprintf ("info: mod failed: stack underflow \n");
       } else {
         stack [num_stack - 2] = stack [num_stack - 2] % stack [num_stack - 1];
@@ -1958,7 +1958,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       }
       tprintf ("action: not\n");
       if (num_stack < 1) {
-          strncpy(notify_msg, "not failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "not failed: stack underflow \n", BUF_LEN);
         tprintf ("info: not failed: stack underflow \n");
       } else {
         stack [num_stack - 1] = ! stack [num_stack - 1];
@@ -1984,7 +1984,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       }
       tprintf ("action: greater\n");
       if (num_stack < 2) {
-          strncpy(notify_msg, "greater failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "greater failed: stack underflow \n", BUF_LEN);
         tprintf ("info: greater failed: stack underflow \n");
       } else {
         stack [num_stack - 2] = stack [num_stack - 2] > stack [num_stack - 1];
@@ -2002,7 +2002,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       strcpy (msg, "dp");
       tprintf ("action: pointer\n");
       if (num_stack < 1) {
-          strncpy(notify_msg, "info: pointer failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "info: pointer failed: stack underflow \n", BUF_LEN);
         tprintf ("info: pointer failed: stack underflow \n");
       } else {
         val = stack [num_stack - 1];
@@ -2032,7 +2032,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       strcpy (msg, "cc");
       tprintf ("action: switch\n");
       if (num_stack < 1) {
-          strncpy(notify_msg, "switch failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "switch failed: stack underflow \n", BUF_LEN);
         tprintf ("info: switch failed: stack underflow \n");
       } else {
         val = stack [num_stack - 1];
@@ -2067,7 +2067,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       }
       tprintf ("action: duplicate\n");
       if (num_stack < 1) {
-          strncpy(notify_msg, "duplicate failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "duplicate failed: stack underflow \n", BUF_LEN);
         tprintf ("info: duplicate failed: stack underflow \n");
       } else {
         alloc_stack_space (num_stack + 1);
@@ -2095,7 +2095,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       }
       tprintf ("action: roll\n");
       if (num_stack < 2) {
-          strncpy(notify_msg, "roll failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "roll failed: stack underflow \n", BUF_LEN);
         tprintf ("info: roll failed: stack underflow \n");
       } else {
         roll = stack [num_stack - 1];
@@ -2103,10 +2103,10 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
         num_stack -= 2;
 
         if (depth < 0) {
-            strncpy(notify_msg, "roll failed: negative depth \n", BUF_LEN);
+          strncpy(notify_msg, "roll failed: negative depth \n", BUF_LEN);
           tprintf ("info: roll failed: negative depth \n");
         } else if (num_stack < depth) {
-            strncpy(notify_msg, "roll failed: stack underflow \n", BUF_LEN);
+          strncpy(notify_msg, "roll failed: stack underflow \n", BUF_LEN);
           tprintf ("info: roll failed: stack underflow \n");
         } else {
           int i;
@@ -2149,13 +2149,13 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
 
 //       if (! quiet) {
         /* show a prompt: */
-// 	printf ("? "); fflush (stdout);
+//         printf ("? "); fflush (stdout);
 //       }
       c = read_int();
 //       if (1 != scanf (stdin, "%d", &c)) {
-//           strncpy(notify_msg, "cannot read int from stdin", BUF_LEN);
-// 	tprintf ("info: cannot read int from stdin; reason: %s\n",
-// 		 strerror (errno));
+//         strncpy(notify_msg, "cannot read int from stdin", BUF_LEN);
+//         tprintf ("info: cannot read int from stdin; reason: %s\n",
+//         strerror (errno));
 //       } else {
         stack [num_stack++] = c;
 //       }
@@ -2185,10 +2185,10 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
 
       if (! quiet) {
         /* show a prompt: */
-// 	printf ("? "); fflush (stdout);
+//        printf ("? "); fflush (stdout);
       }
       if ((c = /*getchar*/ read_char()) < 0) {
-          strncpy(notify_msg, "cannot read char from stdin", BUF_LEN);
+        strncpy(notify_msg, "cannot read char from stdin", BUF_LEN);
         tprintf ("info: cannot read char from stdin; reason: %s\n",
                  strerror (errno));
       } else {
@@ -2209,7 +2209,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       }
       tprintf ("action: out(number)\n");
       if (num_stack < 1) {
-          strncpy(notify_msg, "out(number) failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "out(number) failed: stack underflow \n", BUF_LEN);
         tprintf ("info: out(number) failed: stack underflow \n");
       } else {
         printf ("%ld", stack [num_stack - 1]); fflush (stdout);
@@ -2234,7 +2234,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       }
       tprintf ("action: out(char)\n");
       if (num_stack < 1) {
-          strncpy(notify_msg, "out(char) failed: stack underflow \n", BUF_LEN);
+        strncpy(notify_msg, "out(char) failed: stack underflow \n", BUF_LEN);
         tprintf ("info: out(char) failed: stack underflow \n");
       } else {
         printf ("%c", (int) (stack [num_stack - 1] & 0xff));
