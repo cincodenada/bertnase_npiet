@@ -170,6 +170,9 @@ char *do_n_str = 0;
  */
 int version_11 = 0;
 
+/* run as a library, controlled by an external program */
+int run_as_lib = 1;
+
 /* helper: */
 #define dprintf         if (debug) printf
 #define d2printf        if (debug > 1) printf
@@ -2133,18 +2136,20 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       tprintf ("action: in(number)\n");
       alloc_stack_space (num_stack + 1);
 
-//       if (! quiet) {
-        /* show a prompt: */
-//         printf ("? "); fflush (stdout);
-//       }
-      c = read_int();
-//       if (1 != scanf (stdin, "%d", &c)) {
-//         strncpy(notify_msg, "cannot read int from stdin", BUF_LEN);
-//         tprintf ("info: cannot read int from stdin; reason: %s\n",
-//         strerror (errno));
-//       } else {
-        stack [num_stack++] = c;
-//       }
+      if (run_as_lib) {
+        stack [num_stack++] = read_int();
+      } else {
+        if (! quiet) {
+          /* show a prompt: */
+          printf ("? "); fflush (stdout);
+        }
+        if (1 != fscanf (stdin, "%d", &c)) {
+          pc_info ("info: cannot read int from stdin; reason: %s\n",
+          strerror (errno));
+        } else {
+          stack [num_stack++] = c;
+        }
+      }
       tdump_stack ();
     }
     
@@ -2169,16 +2174,19 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
       tprintf ("action: in(char)\n");
       alloc_stack_space (num_stack + 1);
 
-      if (! quiet) {
-        /* show a prompt: */
-//        printf ("? "); fflush (stdout);
-      }
-      if ((c = /*getchar*/ read_char()) < 0) {
-        strncpy(notify_msg, "cannot read char from stdin", BUF_LEN);
-        tprintf ("info: cannot read char from stdin; reason: %s\n",
-                 strerror (errno));
+      if (run_as_lib) {
+        stack [num_stack++] = read_char() % 0xff;
       } else {
-        stack [num_stack++] = c % 0xff;
+        if (! quiet) {
+          /* show a prompt: */
+          printf ("? "); fflush (stdout);
+        }
+        if ((c = getchar()) < 0) {
+          pc_info ("info: cannot read char from stdin; reason: %s\n",
+                   strerror (errno));
+        } else {
+          stack [num_stack++] = c % 0xff;
+        }
       }
       tdump_stack ();
 
