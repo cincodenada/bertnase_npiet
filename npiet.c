@@ -2822,3 +2822,13 @@ int set_image(int w, int h)
     width = w;
     alloc_cells (width, height);
 }
+
+void set_max_exec_step(int max)
+{
+  max_exec_step = max;
+}
+
+int get_max_exec_step()
+{
+  return max_exec_step;
+}

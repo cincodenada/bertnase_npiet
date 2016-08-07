@@ -53,6 +53,8 @@ struct c_color {
 };
 
 int set_image( int w, int h );
+void set_max_exec_step( int max );
+int get_max_exec_step();
 int read_ppm (char *fname);
 int read_png (char *fname);
 int get_color_idx (int col);
