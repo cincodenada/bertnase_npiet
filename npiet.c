@@ -2514,7 +2514,8 @@ piet_run ()
       break;
     }
 
-    if (do_gdtrace && trace) {
+    if (do_gdtrace && trace
+        && exec_step >= gd_trace_start && exec_step <= gd_trace_end) {
       /*
        * in case of additional tracing, make sure we always have
        * an up-to-date picture; it's way expensive, so it may be
