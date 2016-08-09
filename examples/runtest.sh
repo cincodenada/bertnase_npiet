@@ -24,3 +24,17 @@ rm -f npiet-trace.png 2>/dev/null
 ../npiet -te 0 hi.png
 ../npiet npiet-trace.png
 rm -f npiet-trace.png 2>/dev/null
+
+echo
+echo "**"
+echo "** running: npiet pointer test - expect Passed - OK:"
+echo "** (npiet version 1.3d and before is buggy: expect FAILED - NO)"
+echo "**"
+RESULT=`../npiet pointer_test.ppm`
+if [ $RESULT == 'OK' ]; then
+    echo "Passed, got $RESULT"
+else
+    echo "/!\\ FAILED /!\\ Expected 'OK', got '$RESULT'"
+fi
+
+echo

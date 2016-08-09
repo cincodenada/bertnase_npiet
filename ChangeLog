@@ -1,3 +1,16 @@
+2016-08-08  <schoenfr@myth>
+
+	* version set to 1.3e
+	
+	* npiet.c: added patch for `the pointer command [...] does not
+  	  rotate the dp'' bug.
+
+	* examples/{runtest.sh,pointer_test.ppm}: added testcase for the
+  	  direction pointer bug.
+
+	  bugreport, patch and patch with testcase provided by Joel
+	  <cincodenada@gmail.com> - thanks a lot !
+
 2014-12-04  <schoenfr@myth>
 
 	* version set to 1.3d

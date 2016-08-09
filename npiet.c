@@ -1,6 +1,6 @@
 /*
  * npiet.c:						May 2004
- * (schoenfr@web.de)					Jan 2014
+ * (schoenfr@web.de)					Aug 2016
  *
  * npiet is an interperter for the piet programming language.
  * 
@@ -54,7 +54,7 @@
  *
  */
 
-char *version = "v1.3d";
+char *version = "v1.3e";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1991,7 +1991,7 @@ piet_action (int c_col, int a_col, int num_cells, char *msg)
 	for (i = 0; val > 0 && i < (val % 4); i++) {
 	  p_dir_pointer = turn_dp (p_dir_pointer);
 	}
-	for (i = 0; val < 0 && i > ((-1 * val) % 4); i++) {
+	for (i = 0; val < 0 && i > -((-1 * val) % 4); i--) {
 	  p_dir_pointer = turn_dp_inv (p_dir_pointer);
 	}
 	num_stack--;
